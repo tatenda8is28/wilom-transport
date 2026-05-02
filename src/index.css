@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+@theme {
+  --color-wilom-navy: #0f172a;
+  --color-wilom-red: #dc2626;
+  --color-wilom-gray: #64748b;
+  --color-wilom-light: #f8fafc;
+}
+
+@layer base {
+  body {
+    @apply bg-wilom-light text-slate-900 font-sans;
+  }
+}
