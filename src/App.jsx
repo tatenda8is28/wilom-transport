@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+// Ensure these paths match your folder names exactly (Case Sensitive)
 import Navbar from './components/common/Navbar';
 import Footer from './components/common/Footer';
 import Home from './pages/public/Home';
@@ -12,11 +13,11 @@ function Layout({ children }) {
   const isAdmin = location.pathname.startsWith('/admin');
 
   return (
-    <>
+    <div className="min-h-screen flex flex-col">
       {!isAdmin && <Navbar />}
       <main className="flex-grow">{children}</main>
       {!isAdmin && <Footer />}
-    </>
+    </div>
   );
 }
 
@@ -26,6 +27,7 @@ export default function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/home" element={<Home />} />
           <Route path="/inventory" element={<Inventory />} />
           <Route path="/admin/*" element={<Dashboard />} />
         </Routes>
