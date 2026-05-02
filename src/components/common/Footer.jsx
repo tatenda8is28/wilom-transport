@@ -7,12 +7,12 @@ export default function Footer() {
     <footer className="bg-[#0f172a] text-white pt-24 pb-12">
       <div className="max-w-7xl mx-auto px-4 text-left">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-16 mb-20">
+           <Link to="/" className="flex items-center gap-3 shrink-0">
+                    <img src="/logo.png" alt="Wilom Logo" className="h-12 md:h-14 object-contain" />
+                    
+                  </Link>
           <div>
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-10 h-10 bg-white flex items-center justify-center rounded text-[#0f172a] font-black text-xl italic leading-none">W</div>
-              <span className="font-black text-2xl tracking-tighter">WILOM</span>
-            </div>
-            <p className="text-slate-400 font-medium">Premium UK trucks delivered to Zimbabwe at unbeatable prices.</p>
+             <p className="text-slate-400 font-medium">Premium UK trucks delivered to Zimbabwe at unbeatable prices.</p>
           </div>
           <div>
             <h4 className="font-black text-xs uppercase tracking-[0.3em] mb-8 text-white/50">Quick Links</h4>

@@ -11,10 +11,7 @@ export default function Navbar() {
         {/* REAL LOGO */}
         <Link to="/" className="flex items-center gap-3 shrink-0">
           <img src="/logo.png" alt="Wilom Logo" className="h-12 md:h-14 object-contain" />
-          <div className="flex flex-col text-left">
-            <span className="font-black text-xl md:text-2xl tracking-tighter leading-none text-[#0f172a]">WILOM</span>
-            <span className="text-[8px] md:text-[9px] font-bold text-[#dc2626] uppercase tracking-[0.2em]">Transport Solutions</span>
-          </div>
+          
         </Link>
 
         <div className="hidden md:flex items-center gap-10 font-black text-[#0f172a] text-[13px] uppercase tracking-widest">
