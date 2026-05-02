@@ -1,13 +1,11 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
-// Ensure these paths match your folder names exactly (Case Sensitive)
 import Navbar from './components/common/Navbar';
 import Footer from './components/common/Footer';
 import Home from './pages/public/Home';
 import Inventory from './pages/public/Inventory';
 import Dashboard from './pages/admin/Dashboard';
 
-// Layout wrapper to hide Navbar/Footer on Admin pages
 function Layout({ children }) {
   const location = useLocation();
   const isAdmin = location.pathname.startsWith('/admin');
