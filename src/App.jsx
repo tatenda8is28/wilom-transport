@@ -6,6 +6,7 @@ import Home from './pages/public/Home';
 import Inventory from './pages/public/Inventory';
 import Dashboard from './pages/admin/Dashboard';
 
+// This wrapper handles showing/hiding the main nav on admin pages
 function Layout({ children }) {
   const location = useLocation();
   const isAdmin = location.pathname.startsWith('/admin');
@@ -13,7 +14,7 @@ function Layout({ children }) {
   return (
     <div className="min-h-screen flex flex-col">
       {!isAdmin && <Navbar />}
-      <main className="flex-grow">{children}</main>
+      <main className="grow">{children}</main>
       {!isAdmin && <Footer />}
     </div>
   );
