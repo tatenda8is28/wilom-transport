@@ -3,12 +3,13 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/common/Navbar';
 import Footer from './components/common/Footer';
 import Home from './pages/public/Home';
-import Inventory from './pages/public/inventory';
+import Inventory from './pages/public/Inventory'; 
 import Dashboard from './pages/admin/Dashboard';
 
 function Layout({ children }) {
   const location = useLocation();
   const isAdmin = location.pathname.startsWith('/admin');
+
   return (
     <div className="min-h-screen flex flex-col">
       {!isAdmin && <Navbar />}
