@@ -1,54 +1,56 @@
 import React from 'react';
-import { Package, MessageSquare, TrendingUp } from 'lucide-react';
+import { Package, MessageSquare, TrendingUp, Truck, Clock } from 'lucide-react';
 
-function StatCard({ icon, label, value, sub }) {
+function PillCard({ icon, label, value, sub, color }) {
   return (
-    <div className="bg-white p-8 rounded-[32px] border border-slate-100 shadow-sm flex items-center gap-6 text-left">
-      <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center">{icon}</div>
-      <div>
-        <p className="text-slate-400 font-black text-[10px] uppercase tracking-widest">{label}</p>
-        <p className="text-3xl font-black text-[#0f172a] my-1 tracking-tighter">{value}</p>
-        <p className="text-slate-400 font-bold text-xs">{sub}</p>
+    <div className="bg-white px-6 py-12 rounded-[4rem] border border-slate-100 shadow-sm flex flex-col items-center text-center gap-6">
+      <div className="text-slate-200">{icon}</div>
+      <div className="space-y-1">
+        <p className="text-slate-400 font-black text-[10px] uppercase tracking-[0.2em]">{label}</p>
+        <p className="text-5xl font-black text-[#0f172a] italic tracking-tighter">{value}</p>
+        <p className="text-slate-300 font-bold text-[9px] uppercase tracking-widest">{sub}</p>
       </div>
-    </div>
-  );
-}
-
-function ActivityRow({ label, time, text }) {
-  return (
-    <div className="flex items-center justify-between border-b border-slate-50 pb-6 text-left last:border-0 last:pb-0">
-       <div>
-          <p className="text-[#0f172a] font-black">{label}</p>
-          <p className="text-slate-400 text-sm font-bold">{text}</p>
-       </div>
-       <span className="text-[10px] font-black text-slate-400 uppercase">{time}</span>
     </div>
   );
 }
 
 export default function AdminOverview() {
   return (
-    <div className="space-y-12">
-      <header className="text-left">
-        <h1 className="text-4xl font-black text-[#0f172a] tracking-tight">Overview</h1>
-        <p className="text-slate-400 font-bold mt-2">Welcome back. Here is what's happening today.</p>
-      </header>
-
-      {/* STATS GRID */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <StatCard icon={<Package className="text-blue-600"/>} label="Total Stock" value="12" sub="4 in transit from UK" />
-        <StatCard icon={<MessageSquare className="text-green-600"/>} label="WhatsApp Leads" value="48" sub="+12 this week" />
-        <StatCard icon={<TrendingUp className="text-[#dc2626]"/>} label="Interest Heatmap" value="Scania R450" sub="Most viewed item" />
+    <div className="space-y-10">
+      
+      {/* VERTICAL PILL CARDS GRID */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <PillCard icon={<TrendingUp size={32}/>} label="Total Revenue" value="£0" sub="UK Orders Delivered" />
+        <PillCard icon={<Clock size={32}/>} label="Active Leads" value="4" sub="Awaiting WhatsApp" />
+        <PillCard icon={<Truck size={32}/>} label="On The Water" value="2" sub="In Transit to Zim" />
       </div>
 
-      {/* RECENT ACTIVITY */}
-      <div className="bg-white rounded-[40px] p-10 border border-slate-100 shadow-sm">
-        <h3 className="text-xl font-black mb-8 text-left text-[#0f172a]">Recent Activity</h3>
-        <div className="space-y-6">
-          <ActivityRow label="New WhatsApp Lead" time="2 mins ago" text="Customer inquiring about MAN TGX 26.460" />
-          <ActivityRow label="Price Updated" time="1 hour ago" text="Scania R450 updated from $26,500 to $27,000" />
-          <ActivityRow label="Stock Added" time="5 hours ago" text="Volvo FH 460 successfully published to inventory" />
-          <ActivityRow label="Status Changed" time="Yesterday" text="DAF CF Tipper moved to 'In Transit'" />
+      {/* PRIORITY LIST (Matches Inspiration) */}
+      <div className="bg-white rounded-[3rem] p-10 border border-slate-100 shadow-sm">
+        <h2 className="text-3xl font-black text-[#0f172a] italic uppercase tracking-tighter mb-10 text-left">Priority Items</h2>
+        
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em]">
+                <th className="pb-6">Reference</th>
+                <th className="pb-6">Location</th>
+                <th className="pb-6">Status</th>
+              </tr>
+            </thead>
+            <tbody className="text-sm font-black text-[#0f172a]">
+              <tr className="border-t border-slate-50">
+                <td className="py-6 uppercase italic">Scania R450</td>
+                <td className="py-6 uppercase text-slate-400">UK Stock</td>
+                <td className="py-6"><span className="bg-green-100 text-green-600 px-3 py-1 rounded-full text-[9px]">READY</span></td>
+              </tr>
+              <tr className="border-t border-slate-50">
+                <td className="py-6 uppercase italic">Mercedes Actros</td>
+                <td className="py-6 uppercase text-slate-400">On Vessel</td>
+                <td className="py-6"><span className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-[9px]">TRANSIT</span></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
