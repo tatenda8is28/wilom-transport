@@ -6,7 +6,7 @@ import Home from './pages/public/Home';
 import Inventory from './pages/public/Inventory'; 
 import Dashboard from './pages/admin/Dashboard';
 import About from './pages/public/About';
-
+import HowItWorks from './pages/public/HowItWorks';
 
 function Layout({ children }) {
   const location = useLocation();
@@ -31,6 +31,7 @@ export default function App() {
           <Route path="/inventory" element={<Inventory />} />
           <Route path="/admin/*" element={<Dashboard />} />
           <Route path="/about" element={<About />} />
+          <Route path="/how-it-works" element={<HowItWorks />} />
         </Routes>
       </Layout>
     </BrowserRouter>
