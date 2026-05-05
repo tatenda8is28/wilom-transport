@@ -5,6 +5,8 @@ import Footer from './components/common/Footer';
 import Home from './pages/public/Home';
 import Inventory from './pages/public/Inventory'; 
 import Dashboard from './pages/admin/Dashboard';
+import About from './pages/public/About';
+
 
 function Layout({ children }) {
   const location = useLocation();
@@ -28,6 +30,7 @@ export default function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/inventory" element={<Inventory />} />
           <Route path="/admin/*" element={<Dashboard />} />
+          <Route path="/about" element={<About />} />
         </Routes>
       </Layout>
     </BrowserRouter>
