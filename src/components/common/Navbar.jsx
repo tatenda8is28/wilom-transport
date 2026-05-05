@@ -109,8 +109,7 @@ export default function Navbar() {
           {/* MENU FOOTER */}
           <div className="p-8 bg-slate-50">
             <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">
-              Registered in UK & Zimbabwe <br />
-              © 2026 Wilom Transport Solutions
+              © 2026 WILOM Masvanhise Transport solutions. Pvt Ltd
             </p>
           </div>
 
