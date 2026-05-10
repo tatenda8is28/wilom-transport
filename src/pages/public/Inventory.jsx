@@ -87,7 +87,7 @@ export default function Inventory() {
       const message = encodeURIComponent(
         `Hi Wilom Transport, I'm interested in the ${v.make} ${v.model} (${v.year}) listed at $${v.delivered_price_usd.toLocaleString()}. Is this unit still available?`
       );
-      window.open(`https://wa.me/263710500296?text=${message}`, '_blank');
+      window.open(`https://wa.me/263788286326?text=${message}`, '_blank');
     }
   };
 
@@ -168,7 +168,7 @@ export default function Inventory() {
                          <div className="flex items-center gap-3"><Calendar size={16} className="text-slate-200"/> {v.year} Model</div>
                          <div className="flex items-center gap-3"><Settings2 size={16} className="text-slate-200"/> {v.gearbox}</div>
                          <div className="flex items-center gap-3"><Truck size={16} className="text-slate-200"/> {v.axle_config} Axle</div>
-                         <div className="flex items-center gap-3"><Gauge size={16} className="text-slate-200"/> {v.mileage_miles?.toLocaleString()} Mi</div>
+                         <div className="flex items-center gap-3"><Gauge size={16} className="text-slate-200"/> {v.mileage_miles?.toLocaleString()} KM</div>
                       </div>
 
                       <div className="grid grid-cols-2 gap-4 bg-slate-50 p-8 rounded-[2.5rem] mb-8">
