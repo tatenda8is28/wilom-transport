@@ -26,7 +26,7 @@ export default function Navbar() {
 
   const trackContactLead = async () => {
     await supabase.from('leads').insert([{ type: 'general_contact' }]);
-    window.open('https://wa.me/263710500296?text=Hi%20Wilom%20Transport,%20I%20would%20like%20to%20make%20a%20general%20inquiry.', '_blank');
+    window.open('https://wa.me/263788286326?text=Hi%20Wilom%20Transport,%20I%20would%20like%20to%20make%20a%20general%20inquiry.', '_blank');
   };
 
   return (

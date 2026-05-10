@@ -28,7 +28,7 @@ export default function Footer() {
               <a href="https://www.tiktok.com/@willy.dube" target="_blank" rel="noreferrer" className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center hover:bg-[#dc2626] transition-all text-white border border-white/5">
                 <Video size={20} />
               </a>
-              <a href="https://wa.me/263710500296" target="_blank" rel="noreferrer" className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center hover:bg-[#25d366] transition-all text-white border border-white/5">
+              <a href="https://wa.me/263788286326" target="_blank" rel="noreferrer" className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center hover:bg-[#25d366] transition-all text-white border border-white/5">
                 <MessageCircle size={20} />
               </a>
               <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-white border border-white/5">

@@ -175,7 +175,7 @@ export default function AdminStock() {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div><label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">YEAR</label><input name="year" value={formData.year} onChange={handleInputChange} type="number" className="w-full bg-slate-50 p-4 rounded-2xl font-bold" /></div>
-                    <div><label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">MILES</label><input name="mileage_miles" value={formData.mileage_miles} onChange={handleInputChange} type="number" className="w-full bg-slate-50 p-4 rounded-2xl font-bold" /></div>
+                    <div><label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">Kilometers</label><input name="mileage_miles" value={formData.mileage_miles} onChange={handleInputChange} type="number" className="w-full bg-slate-50 p-4 rounded-2xl font-bold" /></div>
                   </div>
                 </div>
 
