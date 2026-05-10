@@ -18,7 +18,7 @@ function VehicleCard({ vehicle }) {
       console.error("Lead tracking failed:", err);
     } finally {
       const msg = encodeURIComponent(`Hi Wilom Transport, I'm interested in the ${v.make} ${v.model} (${v.year}) listed at $${v.delivered_price_usd.toLocaleString()}. Is this unit available?`);
-      window.open(`https://wa.me/263710500296?text=${msg}`, '_blank');
+      window.open(`https://wa.me/263788286326?text=${msg}`, '_blank');
     }
   };
 
@@ -95,7 +95,7 @@ export default function Home() {
            <h1 className="text-6xl md:text-[100px] font-black text-white leading-[0.9] mb-10 tracking-tighter text-left uppercase italic leading-none">Heavy Duty Deals. <br /><span className="text-[#dc2626]">Delivered Across <br /> Borders.</span></h1>
            <div className="flex flex-wrap gap-5">
               <button onClick={() => navigate('/inventory')} className="bg-[#dc2626] text-white px-12 py-5 rounded-xl font-black text-lg flex items-center gap-3 group shadow-2xl">Browse Vehicles <ArrowRight size={22} className="group-hover:translate-x-1 transition-transform"/></button>
-              <button onClick={() => window.open('https://wa.me/263710500296')} className="bg-white/5 backdrop-blur-md border border-white/20 text-white px-12 py-5 rounded-xl font-black text-lg hover:bg-white/10 transition flex items-center gap-3"><Phone size={22} className="text-[#dc2626]"/> Contact Us</button>
+              <button onClick={() => window.open('https://wa.me/263788286326')} className="bg-white/5 backdrop-blur-md border border-white/20 text-white px-12 py-5 rounded-xl font-black text-lg hover:bg-white/10 transition flex items-center gap-3"><Phone size={22} className="text-[#dc2626]"/> Contact Us</button>
            </div>
         </div>
       </section>
