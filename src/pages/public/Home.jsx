@@ -36,7 +36,7 @@ function VehicleCard({ vehicle }) {
            <div className="flex items-center gap-2 text-left"><Calendar size={14}/> {vehicle.year} Model</div>
            <div className="flex items-center gap-2 text-left"><Settings2 size={14}/> {vehicle.gearbox}</div>
            <div className="flex items-center gap-2 text-left"><Truck size={14}/> {vehicle.axle_config}</div>
-           <div className="flex items-center gap-2 text-left"><Gauge size={14}/> {vehicle.mileage_miles?.toLocaleString()} Mi</div>
+           <div className="flex items-center gap-2 text-left"><Gauge size={14}/> {vehicle.mileage_miles?.toLocaleString()} KM</div>
         </div>
         <div className="flex justify-between items-end bg-slate-50 p-7 rounded-[2rem] mb-8">
           <div className="text-left">
