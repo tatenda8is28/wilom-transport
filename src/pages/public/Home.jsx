@@ -105,7 +105,7 @@ export default function Home() {
         <div className="bg-white p-6 rounded-[32px] shadow-2xl border border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
           <div className="text-left">
             <label className="text-[10px] font-black uppercase text-slate-400 px-4 mb-2 block tracking-widest">Brand</label>
-            <select value={searchMake} onChange={(e) => setSearchMake(e.target.value)} className="w-full bg-slate-50 p-5 rounded-2xl font-bold outline-none border border-slate-100 cursor-pointer"><option>All Brands</option><option>Mercedes-Benz</option><option>Scania</option><option>Volvo</option><option>DAF</option><option>Iveco</option></select>
+            <select value={searchMake} onChange={(e) => setSearchMake(e.target.value)} className="w-full bg-slate-50 p-5 rounded-2xl font-bold outline-none border border-slate-100 cursor-pointer"><option>All Brands</option><option>Mercedes-Benz</option><option>Scania</option><option>Volvo</option><option>DAF</option><option>Iveco</option><option>Man</option></select>
           </div>
           <div className="text-left">
             <label className="text-[10px] font-black uppercase text-slate-400 px-4 mb-2 block tracking-widest">Vehicle Type</label>
