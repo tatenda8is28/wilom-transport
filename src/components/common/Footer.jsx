@@ -72,7 +72,7 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-4">
                 <Phone size={20} className="text-[#dc2626] shrink-0"/>
-                <span>ZIM: +263 710 500 296</span>
+                <span>ZIM: +263 78 828 6326</span>
               </li>
             </ul>
           </div>

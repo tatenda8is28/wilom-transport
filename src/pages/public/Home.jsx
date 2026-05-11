@@ -1,27 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { 
   ArrowRight, Phone, Gauge, Calendar, 
   MapPin, Search, ChevronDown, Loader2, 
-  MessageCircle, Settings2, Truck, Anchor 
+  Settings2, Truck, Anchor, Eye 
 } from 'lucide-react';
 import { supabase } from '../../api/supabase';
 
-// VEHICLE CARD COMPONENT
+// VEHICLE CARD COMPONENT - UPDATED (Removed WhatsApp)
 function VehicleCard({ vehicle }) {
-  const trackWhatsAppInquiry = async (v) => {
-    try {
-      await supabase.from('leads').insert([
-        { type: 'whatsapp_inquiry', vehicle_name: `${v.make} ${v.model}`, vehicle_id: v.id }
-      ]);
-    } catch (err) {
-      console.error("Lead tracking failed:", err);
-    } finally {
-      const msg = encodeURIComponent(`Hi Wilom Transport, I'm interested in the ${v.make} ${v.model} (${v.year}) listed at $${v.delivered_price_usd.toLocaleString()}. Is this unit available?`);
-      window.open(`https://wa.me/263788286326?text=${msg}`, '_blank');
-    }
-  };
-
   return (
     <div className="bg-white rounded-[3.5rem] overflow-hidden border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-700 group flex flex-col h-full text-left">
       <div className="relative aspect-[16/11] overflow-hidden">
@@ -30,13 +17,13 @@ function VehicleCard({ vehicle }) {
         <div className="absolute bottom-6 right-6 flex items-center gap-2 bg-[#0f172a] text-white px-4 py-2 rounded-2xl text-[10px] font-black uppercase shadow-xl"><MapPin size={12} className="text-[#dc2626]" /> {vehicle.location}</div>
       </div>
       <div className="p-10 flex-grow flex flex-col">
-        <h3 className="font-black text-3xl text-[#0f172a] leading-none mb-2">{vehicle.make}</h3>
-        <p className="text-slate-400 font-bold text-lg mb-6">{vehicle.model}</p>
+        <h3 className="font-black text-3xl text-[#0f172a] leading-none mb-2 uppercase italic">{vehicle.make}</h3>
+        <p className="text-slate-400 font-bold text-lg mb-6 uppercase">{vehicle.model}</p>
         <div className="grid grid-cols-2 gap-4 text-[10px] font-black text-slate-400 uppercase tracking-tighter mb-10 pt-6 border-t border-slate-50">
-           <div className="flex items-center gap-2 text-left"><Calendar size={14}/> {vehicle.year} Model</div>
-           <div className="flex items-center gap-2 text-left"><Settings2 size={14}/> {vehicle.gearbox}</div>
-           <div className="flex items-center gap-2 text-left"><Truck size={14}/> {vehicle.axle_config}</div>
-           <div className="flex items-center gap-2 text-left"><Gauge size={14}/> {vehicle.mileage_miles?.toLocaleString()} KM</div>
+           <div className="flex items-center gap-2 text-left"><Calendar size={14} className="text-slate-200"/> {vehicle.year} Model</div>
+           <div className="flex items-center gap-2 text-left"><Settings2 size={14} className="text-slate-200"/> {vehicle.gearbox}</div>
+           <div className="flex items-center gap-2 text-left"><Truck size={14} className="text-slate-200"/> {vehicle.axle_config}</div>
+           <div className="flex items-center gap-2 text-left"><Gauge size={14} className="text-slate-200"/> {vehicle.mileage_miles?.toLocaleString()} Mi</div>
         </div>
         <div className="flex justify-between items-end bg-slate-50 p-7 rounded-[2rem] mb-8">
           <div className="text-left">
@@ -48,7 +35,14 @@ function VehicleCard({ vehicle }) {
             <span className="text-2xl font-black text-[#dc2626]">${Number(vehicle.delivered_price_usd).toLocaleString()}</span>
           </div>
         </div>
-        <button onClick={() => trackWhatsAppInquiry(vehicle)} className="w-full bg-[#25d366] text-white py-5 rounded-[2rem] font-black text-lg flex items-center justify-center gap-3 hover:bg-[#1fb356] transition-all shadow-xl active:scale-95"><MessageCircle size={24} /> Enquire on WhatsApp</button>
+        
+        {/* PRIMARY ACTION: LEAD TO DETAILS */}
+        <Link 
+          to={`/vehicle/${vehicle.id}`} 
+          className="w-full bg-[#0f172a] text-white py-5 rounded-[2rem] font-black text-lg flex items-center justify-center gap-3 hover:bg-slate-800 transition-all shadow-xl active:scale-95"
+        >
+          <Eye size={22} /> View Full Specs
+        </Link>
       </div>
     </div>
   );
@@ -61,7 +55,15 @@ export default function Home() {
   const [searchMake, setSearchMake] = useState('All Brands');
   const [searchType, setSearchType] = useState('All Types');
 
-
+  const BRAND_LOGOS = [
+    { name: 'MAN', domain: 'man-truck-and-bus.com' },
+    { name: 'SCANIA', domain: 'scania.com' },
+    { name: 'VOLVO', domain: 'volvo.com' },
+    { name: 'MERCEDES', domain: 'mercedes-benz.com' },
+    { name: 'DAF', domain: 'daf.com' },
+    { name: 'FORD', domain: 'ford.com' },
+    { name: 'IVECO', domain: 'iveco.com' },
+  ];
 
   useEffect(() => {
     async function fetchFeatured() {
@@ -95,7 +97,7 @@ export default function Home() {
            <h1 className="text-6xl md:text-[100px] font-black text-white leading-[0.9] mb-10 tracking-tighter text-left uppercase italic leading-none">Heavy Duty Deals. <br /><span className="text-[#dc2626]">Delivered Across <br /> Borders.</span></h1>
            <div className="flex flex-wrap gap-5">
               <button onClick={() => navigate('/inventory')} className="bg-[#dc2626] text-white px-12 py-5 rounded-xl font-black text-lg flex items-center gap-3 group shadow-2xl">Browse Vehicles <ArrowRight size={22} className="group-hover:translate-x-1 transition-transform"/></button>
-              <button onClick={() => window.open('https://wa.me/263788286326')} className="bg-white/5 backdrop-blur-md border border-white/20 text-white px-12 py-5 rounded-xl font-black text-lg hover:bg-white/10 transition flex items-center gap-3"><Phone size={22} className="text-[#dc2626]"/> Contact Us</button>
+              <button onClick={() => window.open('https://wa.me/263710500296')} className="bg-white/5 backdrop-blur-md border border-white/20 text-white px-12 py-5 rounded-xl font-black text-lg hover:bg-white/10 transition flex items-center gap-3"><Phone size={22} className="text-[#dc2626]"/> Contact Us</button>
            </div>
         </div>
       </section>
@@ -105,23 +107,50 @@ export default function Home() {
         <div className="bg-white p-6 rounded-[32px] shadow-2xl border border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
           <div className="text-left">
             <label className="text-[10px] font-black uppercase text-slate-400 px-4 mb-2 block tracking-widest">Brand</label>
-            <select value={searchMake} onChange={(e) => setSearchMake(e.target.value)} className="w-full bg-slate-50 p-5 rounded-2xl font-bold outline-none border border-slate-100 cursor-pointer"><option>All Brands</option><option>Mercedes-Benz</option><option>Scania</option><option>Volvo</option><option>DAF</option><option>Iveco</option><option>Man</option></select>
+            <select value={searchMake} onChange={(e) => setSearchMake(e.target.value)} className="w-full bg-slate-50 p-5 rounded-2xl font-bold outline-none border border-slate-100 cursor-pointer"><option>All Brands</option><option>Mercedes-Benz</option><option>Scania</option><option>Volvo</option><option>DAF</option><option>Iveco</option></select>
           </div>
           <div className="text-left">
             <label className="text-[10px] font-black uppercase text-slate-400 px-4 mb-2 block tracking-widest">Vehicle Type</label>
             <select value={searchType} onChange={(e) => setSearchType(e.target.value)} className="w-full bg-slate-50 p-5 rounded-2xl font-bold outline-none border border-slate-100 cursor-pointer"><option>All Types</option><option>Tractor Units</option><option>Tipper</option><option>Rigids</option><option>Trailers</option></select>
           </div>
           <div className="pt-6">
-            <button onClick={handleHomeSearch} className="w-full bg-[#dc2626] text-white p-5 rounded-2xl font-black flex items-center justify-center gap-3 hover:bg-red-700 transition shadow-lg"><Search size={22} /> Search Now</button>
+            <button onClick={handleHomeSearch} className="w-full bg-[#dc2626] text-white p-5 rounded-2xl font-black flex items-center justify-center gap-3 hover:bg-red-700 transition shadow-lg shadow-red-200">
+              <Search size={22} /> Search Now
+            </button>
           </div>
         </div>
       </div>
+
+      {/* BRANDS SECTION */}
+      <section className="max-w-7xl mx-auto px-4 py-24 text-left">
+        <span className="text-[#dc2626] font-black uppercase tracking-[0.4em] text-[10px] block mb-3">Trusted Manufacturers</span>
+        <h2 className="text-5xl font-black tracking-tighter text-[#0f172a] mb-12 italic uppercase">Premium Brands We Stock</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-6">
+           {BRAND_LOGOS.map(brand => (
+             <div key={brand.name} className="bg-white h-40 rounded-[2.5rem] border border-slate-100 flex flex-col items-center justify-center shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group p-6">
+                <img 
+                  src={`https://logo.clearbit.com/${brand.domain}?size=128`} 
+                  alt={brand.name} 
+                  className="h-16 w-auto object-contain mb-4 transition-all duration-500" 
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'flex';
+                  }}
+                />
+                <div className="hidden w-12 h-12 bg-slate-50 rounded-full items-center justify-center font-black text-[#0f172a] mb-4 group-hover:bg-[#dc2626] group-hover:text-white transition-colors">
+                  {brand.name[0]}
+                </div>
+                <span className="text-[10px] font-black text-slate-400 group-hover:text-[#0f172a] tracking-widest uppercase">{brand.name}</span>
+             </div>
+           ))}
+        </div>
+      </section>
 
       {/* LATEST ARRIVALS */}
       <section className="max-w-7xl mx-auto px-4 py-12">
         <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-20 text-left">
            <div><span className="text-[#dc2626] font-black uppercase tracking-[0.4em] text-[10px] block mb-3">Hand-Picked</span><h2 className="text-6xl font-black tracking-tighter text-[#0f172a] leading-none uppercase italic">Latest Arrivals</h2></div>
-           <button onClick={() => navigate('/inventory')} className="bg-white border-2 border-slate-200 px-10 py-4 rounded-2xl font-black text-sm hover:bg-slate-900 hover:text-white transition-all">View All Inventory</button>
+           <button onClick={() => navigate('/inventory')} className="bg-white border-2 border-slate-200 px-10 py-4 rounded-2xl font-black text-sm hover:bg-slate-900 hover:text-white transition-all shadow-sm">View All Inventory <ArrowRight size={18} className="inline ml-2" /></button>
         </div>
         {loading ? <div className="flex justify-center py-20"><Loader2 className="animate-spin text-[#dc2626]" size={48} /></div> : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-12 text-left">

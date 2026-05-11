@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, X, Upload, Loader2, Trash2, Edit3 } from 'lucide-react';
+import { Plus, X, Upload, Loader2, Info, BadgeDollarSign, Cog, Trash2, Edit3, Image as ImageIcon } from 'lucide-react';
 import { supabase } from '../../api/supabase';
 
 const BODY_TYPES = ["Rigids", "Tractor Units", "Box van", "Chassis Cab", "Crane Truck", "Curtain sided", "Dropside", "Flatbeds", "Tipper", "Trailers"];
@@ -10,7 +10,8 @@ export default function AdminStock() {
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [inventory, setInventory] = useState([]);
-  const [imageFile, setImageFile] = useState(null);
+  const [mainImage, setMainImage] = useState(null);
+  const [galleryFiles, setGalleryFiles] = useState([]); // Bulk images
   const [isEditing, setIsEditing] = useState(false);
   const [currentId, setCurrentId] = useState(null);
 
@@ -19,7 +20,8 @@ export default function AdminStock() {
     vin: '', registration: '', mileage_miles: '', uk_price_gbp: '',
     delivered_price_usd: '', axle_config: '6x2', horsepower: '',
     gearbox: 'Automatic', emissions_class: 'Euro 6', cab_type: 'Sleeper Cab',
-    mot_expiry: '', location: 'UK', status: 'Available', badge: 'Fresh Arrival'
+    mot_expiry: '', location: 'UK', status: 'Available', badge: 'Fresh Arrival',
+    description: ''
   };
 
   const [formData, setFormData] = useState(initialFormState);
@@ -47,25 +49,45 @@ export default function AdminStock() {
     }
   };
 
+  const uploadFile = async (file) => {
+    const fileName = `${Date.now()}-${file.name}`;
+    const { error } = await supabase.storage.from('vehicle-images').upload(fileName, file);
+    if (error) throw error;
+    const { data } = supabase.storage.from('vehicle-images').getPublicUrl(fileName);
+    return data.publicUrl;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      let publicImageUrl = formData.main_image;
-      if (imageFile) {
-        const fileName = `${Date.now()}-${imageFile.name}`;
-        await supabase.storage.from('vehicle-images').upload(fileName, imageFile);
-        const { data: urlData } = supabase.storage.from('vehicle-images').getPublicUrl(fileName);
-        publicImageUrl = urlData.publicUrl;
+      let publicMainImage = formData.main_image;
+      let publicGalleryUrls = formData.image_gallery || [];
+
+      // 1. Upload Main Image
+      if (mainImage) {
+        publicMainImage = await uploadFile(mainImage);
       }
+
+      // 2. Upload Gallery Images (Bulk)
+      if (galleryFiles.length > 0) {
+        const uploadPromises = Array.from(galleryFiles).map(file => uploadFile(file));
+        const newUrls = await Promise.all(uploadPromises);
+        publicGalleryUrls = [...publicGalleryUrls, ...newUrls];
+      }
+
+      // 3. Auto-generate Stock Number (if not editing)
+      const stockNo = isEditing ? formData.stock_number : `WTS-${Math.floor(1000 + Math.random() * 9000)}`;
 
       const payload = {
         ...formData,
+        stock_number: stockNo,
         year: parseInt(formData.year),
         mileage_miles: parseInt(formData.mileage_miles) || 0,
         uk_price_gbp: parseFloat(formData.uk_price_gbp),
         delivered_price_usd: parseFloat(formData.delivered_price_usd),
-        main_image: publicImageUrl,
+        main_image: publicMainImage,
+        image_gallery: publicGalleryUrls,
         mot_expiry: formData.mot_expiry === "" ? null : formData.mot_expiry 
       };
 
@@ -77,6 +99,8 @@ export default function AdminStock() {
 
       setShowForm(false);
       setIsEditing(false);
+      setMainImage(null);
+      setGalleryFiles([]);
       setFormData(initialFormState);
       fetchInventory();
     } catch (err) { alert(err.message); } finally { setLoading(false); }
@@ -94,12 +118,13 @@ export default function AdminStock() {
         </button>
       </header>
 
-      {/* DESKTOP TABLE */}
-      <div className="hidden md:block bg-white rounded-[40px] border border-slate-100 shadow-sm overflow-hidden text-left">
-        <table className="w-full">
+      {/* TABLE */}
+      <div className="bg-white rounded-[40px] border border-slate-100 shadow-sm overflow-x-auto text-left">
+        <table className="w-full min-w-[900px]">
           <thead>
             <tr className="bg-slate-50 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
-              <th className="px-10 py-6">Vehicle Details</th>
+              <th className="px-10 py-6 text-left">Stock #</th>
+              <th className="px-10 py-6 text-left">Vehicle Details</th>
               <th className="px-10 py-6 text-center">Transmission</th>
               <th className="px-10 py-6 text-right">ZIM Price</th>
               <th className="px-10 py-6 text-center">Actions</th>
@@ -108,6 +133,7 @@ export default function AdminStock() {
           <tbody className="font-bold text-sm text-slate-600">
             {inventory.map((item) => (
               <tr key={item.id} className="border-b border-slate-50">
+                <td className="px-10 py-8 font-black text-[#0f172a] text-xs tracking-tighter">#{item.stock_number}</td>
                 <td className="px-10 py-8 flex items-center gap-4">
                   <img src={item.main_image} className="w-16 h-12 object-cover rounded-xl bg-slate-50" />
                   <div className="flex flex-col"><span className="text-[#0f172a] font-black">{item.make} {item.model}</span><span className="text-[10px] text-slate-400 uppercase tracking-widest">{item.vin}</span></div>
@@ -126,101 +152,72 @@ export default function AdminStock() {
         </table>
       </div>
 
-      {/* MOBILE LIST */}
-      <div className="md:hidden space-y-4">
-        {inventory.map((item) => (
-          <div key={item.id} className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm text-left">
-            <div className="flex gap-4 mb-4">
-              <img src={item.main_image} className="w-20 h-16 object-cover rounded-2xl bg-slate-50" />
-              <div><h3 className="font-black text-[#0f172a] text-base">{item.make}</h3><p className="text-slate-400 font-bold text-xs uppercase">{item.model}</p><p className="text-[#dc2626] font-black mt-1">${Number(item.delivered_price_usd).toLocaleString()}</p></div>
-            </div>
-            <div className="flex justify-between items-center pt-4 border-t border-slate-50">
-              <span className="bg-slate-50 px-3 py-1 rounded-full text-[9px] font-black uppercase text-slate-400">{item.gearbox}</span>
-              <div className="flex gap-3">
-                <button onClick={() => handleEdit(item)} className="p-3 bg-slate-50 text-slate-400 rounded-xl"><Edit3 size={20}/></button>
-                <button onClick={() => handleDelete(item.id)} className="p-3 bg-red-50 text-red-300 rounded-xl"><Trash2 size={20}/></button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* THE FORM MODAL - RESTORED TO EXACT DESIGN */}
       {showForm && (
         <div className="fixed inset-0 bg-[#0f172a]/95 backdrop-blur-md z-[100] flex items-center justify-center p-4">
-           <div className="bg-white w-full max-w-5xl rounded-[48px] p-10 md:p-14 relative max-h-[95vh] overflow-y-auto shadow-2xl">
+           <div className="bg-white w-full max-w-6xl rounded-[48px] p-10 md:p-14 relative max-h-[95vh] overflow-y-auto shadow-2xl">
               <button onClick={() => setShowForm(false)} className="absolute top-10 right-10 text-slate-400 hover:text-[#dc2626] transition"><X size={36}/></button>
               
               <h2 className="text-5xl font-black mb-14 text-[#0f172a] text-left uppercase italic tracking-tighter">{isEditing ? 'Edit Vehicle' : 'List New Vehicle'}</h2>
               
               <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-12 text-left">
                 
-                {/* COLUMN 1: CORE IDENTITY */}
+                {/* COLUMN 1 */}
                 <div className="space-y-6">
-                  <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-                    <span className="w-1.5 h-1.5 bg-[#dc2626] rounded-full"></span>
-                    <h3 className="font-black text-[11px] uppercase tracking-[0.2em] text-slate-400">CORE IDENTITY</h3>
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">MAKE</label>
-                    <select name="make" value={formData.make} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-bold">{MAKES.map(m => <option key={m}>{m}</option>)}</select>
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">MODEL NAME</label>
-                    <input required name="model" value={formData.model} onChange={handleInputChange} type="text" className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-bold" />
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">BODY TYPE</label>
-                    <select name="body_type" value={formData.body_type} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-bold">{BODY_TYPES.map(t => <option key={t}>{t}</option>)}</select>
-                  </div>
+                  <h3 className="font-black text-[11px] uppercase tracking-[0.2em] text-slate-400 border-b pb-3 flex items-center gap-2"><span className="w-1.5 h-1.5 bg-[#dc2626] rounded-full"></span> Core Identity</h3>
+                  <div><label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">MAKE</label><select name="make" value={formData.make} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-bold">{MAKES.map(m => <option key={m}>{m}</option>)}</select></div>
+                  <div><label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">MODEL NAME</label><input required name="model" value={formData.model} onChange={handleInputChange} type="text" className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-bold" /></div>
+                  <div><label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">BODY TYPE</label><select name="body_type" value={formData.body_type} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-bold">{BODY_TYPES.map(t => <option key={t}>{t}</option>)}</select></div>
                   <div className="grid grid-cols-2 gap-4">
                     <div><label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">YEAR</label><input name="year" value={formData.year} onChange={handleInputChange} type="number" className="w-full bg-slate-50 p-4 rounded-2xl font-bold" /></div>
-                    <div><label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">Kilometers</label><input name="mileage_miles" value={formData.mileage_miles} onChange={handleInputChange} type="number" className="w-full bg-slate-50 p-4 rounded-2xl font-bold" /></div>
+                    <div><label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">MILES</label><input name="mileage_miles" value={formData.mileage_miles} onChange={handleInputChange} type="number" className="w-full bg-slate-50 p-4 rounded-2xl font-bold" /></div>
                   </div>
                 </div>
 
-                {/* COLUMN 2: TECHNICAL SPECS */}
+                {/* COLUMN 2 */}
                 <div className="space-y-6">
-                  <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-                    <span className="w-1.5 h-1.5 bg-[#dc2626] rounded-full"></span>
-                    <h3 className="font-black text-[11px] uppercase tracking-[0.2em] text-slate-400">TECHNICAL SPECS</h3>
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">GEARBOX / TRANSMISSION</label>
-                    <select name="gearbox" value={formData.gearbox} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-bold">{GEARBOXES.map(g => <option key={g}>{g}</option>)}</select>
-                  </div>
-                  <div><label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">VIN NUMBER</label><input name="vin" value={formData.vin} onChange={handleInputChange} type="text" className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-bold" /></div>
+                  <h3 className="font-black text-[11px] uppercase tracking-[0.2em] text-slate-400 border-b pb-3 flex items-center gap-2"><span className="w-1.5 h-1.5 bg-[#dc2626] rounded-full"></span> Technical Specs</h3>
+                  <div><label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">GEARBOX</label><select name="gearbox" value={formData.gearbox} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-bold">{GEARBOXES.map(g => <option key={g}>{g}</option>)}</select></div>
+                  <div><label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">VIN NUMBER</label><input name="vin" value={formData.vin} onChange={handleInputChange} type="text" className="w-full bg-slate-50 p-4 rounded-2xl font-bold" /></div>
                   <div className="grid grid-cols-2 gap-4">
                     <div><label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">AXLE</label><input name="axle_config" value={formData.axle_config} onChange={handleInputChange} type="text" className="w-full bg-slate-50 p-4 rounded-2xl font-bold" /></div>
                     <div><label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">POWER</label><input name="horsepower" value={formData.horsepower} onChange={handleInputChange} type="text" className="w-full bg-slate-50 p-4 rounded-2xl font-bold" /></div>
                   </div>
-                  <div><label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">MOT EXPIRY</label><input name="mot_expiry" value={formData.mot_expiry} onChange={handleInputChange} type="date" className="w-full bg-slate-50 p-4 rounded-2xl font-bold" /></div>
                   <div><label className="text-[10px] font-black uppercase text-slate-400 mb-2 block text-blue-600">LOCATION</label><select name="location" value={formData.location} onChange={handleInputChange} className="w-full bg-blue-50/50 border border-blue-100 p-4 rounded-2xl font-bold text-blue-900"><option value="UK">UK (Stock)</option><option value="In Transit">In Transit</option><option value="Zimbabwe">Zimbabwe</option></select></div>
                 </div>
 
-                {/* COLUMN 3: PRICING & MEDIA */}
+                {/* COLUMN 3 */}
                 <div className="space-y-6">
-                  <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-                    <span className="w-1.5 h-1.5 bg-[#dc2626] rounded-full"></span>
-                    <h3 className="font-black text-[11px] uppercase tracking-[0.2em] text-slate-400">PRICING & MEDIA</h3>
-                  </div>
+                  <h3 className="font-black text-[11px] uppercase tracking-[0.2em] text-slate-400 border-b pb-3 flex items-center gap-2"><span className="w-1.5 h-1.5 bg-[#dc2626] rounded-full"></span> Pricing & Gallery</h3>
                   <div className="grid grid-cols-2 gap-4">
-                    <div><label className="text-[10px] font-black text-slate-400 mb-2 block">UK (£)</label><input name="uk_price_gbp" value={formData.uk_price_gbp} onChange={handleInputChange} type="number" className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-bold" /></div>
-                    <div><label className="text-[10px] font-black text-slate-400 mb-2 block">ZIM ($)</label><input name="delivered_price_usd" value={formData.delivered_price_usd} onChange={handleInputChange} type="number" className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-bold text-[#dc2626]" /></div>
+                    <div><label className="text-[10px] font-black text-slate-400 mb-2 block">UK (£)</label><input name="uk_price_gbp" value={formData.uk_price_gbp} onChange={handleInputChange} type="number" className="w-full bg-slate-50 p-4 rounded-2xl font-bold" /></div>
+                    <div><label className="text-[10px] font-black text-slate-400 mb-2 block">ZIM ($)</label><input name="delivered_price_usd" value={formData.delivered_price_usd} onChange={handleInputChange} type="number" className="w-full bg-slate-50 p-4 rounded-2xl font-bold text-[#dc2626]" /></div>
                   </div>
-                  <div><label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">SALE STATUS</label><select name="status" value={formData.status} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-bold"><option value="Available">Available</option><option value="Reserved">Reserved</option><option value="Sold">Sold</option></select></div>
-                  <div className="relative">
-                    <label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">PHOTO</label>
-                    <input type="file" onChange={(e) => setImageFile(e.target.files[0])} className="hidden" id="f-upload" />
-                    <label htmlFor="f-upload" className="border-2 border-dashed border-slate-100 rounded-3xl p-10 text-center text-slate-400 font-bold hover:bg-slate-50 cursor-pointer flex flex-col items-center gap-2">
-                      {imageFile ? <span className="text-[#22c55e] text-[10px]">Photo Ready</span> : <><Upload size={24}/><span className="text-[10px]">Click to Upload</span></>}
-                    </label>
+                  
+                  {/* MAIN PHOTO */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-[9px] font-black uppercase text-slate-400 mb-2 block">MAIN PHOTO</label>
+                      <input type="file" onChange={(e) => setMainImage(e.target.files[0])} className="hidden" id="f-main" />
+                      <label htmlFor="f-main" className="border-2 border-dashed border-slate-100 rounded-xl p-4 text-center cursor-pointer flex flex-col items-center justify-center bg-slate-50 hover:bg-slate-100 transition-all">
+                        <Upload size={16} className="mb-1 opacity-50"/>
+                        <span className="text-[8px] font-black uppercase">{mainImage ? 'Change' : 'Upload'}</span>
+                      </label>
+                    </div>
+                    {/* BULK GALLERY */}
+                    <div>
+                      <label className="text-[9px] font-black uppercase text-slate-400 mb-2 block">GALLERY (BULK)</label>
+                      <input type="file" multiple onChange={(e) => setGalleryFiles(e.target.files)} className="hidden" id="f-gallery" />
+                      <label htmlFor="f-gallery" className="border-2 border-dashed border-slate-100 rounded-xl p-4 text-center cursor-pointer flex flex-col items-center justify-center bg-slate-50 hover:bg-slate-100 transition-all">
+                        <ImageIcon size={16} className="mb-1 opacity-50"/>
+                        <span className="text-[8px] font-black uppercase">{galleryFiles.length > 0 ? `${galleryFiles.length} files` : 'Bulk Pick'}</span>
+                      </label>
+                    </div>
                   </div>
-                  <button disabled={loading} className="w-full bg-[#dc2626] text-white py-6 rounded-[28px] font-black text-xl mt-4 shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-all">
+
+                  <button disabled={loading} className="w-full bg-[#dc2626] text-white py-6 rounded-[28px] font-black text-xl mt-4 shadow-xl flex items-center justify-center gap-3">
                     {loading ? <Loader2 className="animate-spin" /> : (isEditing ? 'SAVE CHANGES' : 'PUBLISH LISTING')}
                   </button>
                 </div>
-
               </form>
            </div>
         </div>
