@@ -7,7 +7,17 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../api/supabase';
 
-// VEHICLE CARD COMPONENT - UPDATED (Removed WhatsApp)
+// BRAND DATA WITH REAL LOGOS
+const BRAND_LOGOS = [
+  { name: 'MAN', url: 'https://www.car-logos.org/wp-content/uploads/2011/09/man.png' },
+  { name: 'SCANIA', url: 'https://www.car-logos.org/wp-content/uploads/2011/09/scania.png' },
+  { name: 'VOLVO', url: 'https://www.car-logos.org/wp-content/uploads/2011/09/volvo.png' },
+  { name: 'MERCEDES', url: 'https://www.car-logos.org/wp-content/uploads/2011/09/mercedes.png' },
+  { name: 'DAF', url: 'https://logo.clearbit.com/daf.com' },
+  { name: 'FORD', url: 'https://www.car-logos.org/wp-content/uploads/2011/09/ford.png' },
+  { name: 'IVECO', url: 'https://logo.clearbit.com/iveco.com' },
+];
+
 function VehicleCard({ vehicle }) {
   return (
     <div className="bg-white rounded-[3.5rem] overflow-hidden border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-700 group flex flex-col h-full text-left">
@@ -20,10 +30,10 @@ function VehicleCard({ vehicle }) {
         <h3 className="font-black text-3xl text-[#0f172a] leading-none mb-2 uppercase italic">{vehicle.make}</h3>
         <p className="text-slate-400 font-bold text-lg mb-6 uppercase">{vehicle.model}</p>
         <div className="grid grid-cols-2 gap-4 text-[10px] font-black text-slate-400 uppercase tracking-tighter mb-10 pt-6 border-t border-slate-50">
-           <div className="flex items-center gap-2 text-left"><Calendar size={14} className="text-slate-200"/> {vehicle.year} Model</div>
-           <div className="flex items-center gap-2 text-left"><Settings2 size={14} className="text-slate-200"/> {vehicle.gearbox}</div>
-           <div className="flex items-center gap-2 text-left"><Truck size={14} className="text-slate-200"/> {vehicle.axle_config}</div>
-           <div className="flex items-center gap-2 text-left"><Gauge size={14} className="text-slate-200"/> {vehicle.mileage_miles?.toLocaleString()} Mi</div>
+           <div className="flex items-center gap-2"><Calendar size={14}/> {vehicle.year} Model</div>
+           <div className="flex items-center gap-2"><Settings2 size={14}/> {vehicle.gearbox}</div>
+           <div className="flex items-center gap-2"><Truck size={14}/> {vehicle.axle_config}</div>
+           <div className="flex items-center gap-2"><Gauge size={14}/> {vehicle.mileage_miles?.toLocaleString()} Mi</div>
         </div>
         <div className="flex justify-between items-end bg-slate-50 p-7 rounded-[2rem] mb-8">
           <div className="text-left">
@@ -35,12 +45,7 @@ function VehicleCard({ vehicle }) {
             <span className="text-2xl font-black text-[#dc2626]">${Number(vehicle.delivered_price_usd).toLocaleString()}</span>
           </div>
         </div>
-        
-        {/* PRIMARY ACTION: LEAD TO DETAILS */}
-        <Link 
-          to={`/vehicle/${vehicle.id}`} 
-          className="w-full bg-[#0f172a] text-white py-5 rounded-[2rem] font-black text-lg flex items-center justify-center gap-3 hover:bg-slate-800 transition-all shadow-xl active:scale-95"
-        >
+        <Link to={`/vehicle/${vehicle.id}`} className="w-full bg-[#0f172a] text-white py-5 rounded-[2rem] font-black text-lg flex items-center justify-center gap-3 hover:bg-slate-800 transition-all shadow-xl">
           <Eye size={22} /> View Full Specs
         </Link>
       </div>
@@ -54,16 +59,6 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [searchMake, setSearchMake] = useState('All Brands');
   const [searchType, setSearchType] = useState('All Types');
-
-  const BRAND_LOGOS = [
-    { name: 'MAN', domain: 'man-truck-and-bus.com' },
-    { name: 'SCANIA', domain: 'scania.com' },
-    { name: 'VOLVO', domain: 'volvo.com' },
-    { name: 'MERCEDES', domain: 'mercedes-benz.com' },
-    { name: 'DAF', domain: 'daf.com' },
-    { name: 'FORD', domain: 'ford.com' },
-    { name: 'IVECO', domain: 'iveco.com' },
-  ];
 
   useEffect(() => {
     async function fetchFeatured() {
@@ -86,17 +81,17 @@ export default function Home() {
       {/* HERO SECTION */}
       <section className="relative bg-[#0f172a] h-[85vh] flex items-center overflow-hidden pb-32">
         <div className="absolute inset-0 z-0">
-           <img src="/hero-truck.jpg" className="w-full h-full object-cover opacity-25" alt="Hero" onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1580674285054-bed31e145f59?auto=format&fit=crop&q=80' }} />
+           <img src="/hero-truck.jpg" className="w-full h-full object-cover opacity-25" alt="Hero" />
            <div className="absolute inset-0 bg-gradient-to-r from-[#0f172a] via-[#0f172a]/70 to-transparent"></div>
         </div>
-        <div className="max-w-7xl mx-auto px-4 relative z-10 w-full text-left">
-           <div className="bg-[#dc2626]/10 border border-[#dc2626]/30 px-5 py-2 rounded-full text-[#dc2626] text-[11px] font-black inline-flex items-center gap-3 mb-10 uppercase tracking-widest">
+        <div className="max-w-7xl mx-auto px-4 relative z-10 w-full text-left uppercase italic">
+           <div className="bg-[#dc2626]/10 border border-[#dc2626]/30 px-5 py-2 rounded-full text-[#dc2626] text-[11px] font-black inline-flex items-center gap-3 mb-10 tracking-widest not-italic">
               <span className="w-2 h-2 bg-[#dc2626] rounded-full animate-pulse"></span>
               UK to Zimbabwe — Direct Import
            </div>
-           <h1 className="text-6xl md:text-[100px] font-black text-white leading-[0.9] mb-10 tracking-tighter text-left uppercase italic leading-none">Heavy Duty Deals. <br /><span className="text-[#dc2626]">Delivered Across <br /> Borders.</span></h1>
-           <div className="flex flex-wrap gap-5">
-              <button onClick={() => navigate('/inventory')} className="bg-[#dc2626] text-white px-12 py-5 rounded-xl font-black text-lg flex items-center gap-3 group shadow-2xl">Browse Vehicles <ArrowRight size={22} className="group-hover:translate-x-1 transition-transform"/></button>
+           <h1 className="text-6xl md:text-[100px] font-black text-white leading-[0.9] mb-10 tracking-tighter">Heavy Duty Deals. <br /><span className="text-[#dc2626]">Delivered Across <br /> Borders.</span></h1>
+           <div className="flex flex-wrap gap-5 not-italic">
+              <button onClick={() => navigate('/inventory')} className="bg-[#dc2626] text-white px-12 py-5 rounded-xl font-black text-lg flex items-center gap-3 group shadow-2xl">Browse Vehicles <ArrowRight size={22} /></button>
               <button onClick={() => window.open('https://wa.me/263710500296')} className="bg-white/5 backdrop-blur-md border border-white/20 text-white px-12 py-5 rounded-xl font-black text-lg hover:bg-white/10 transition flex items-center gap-3"><Phone size={22} className="text-[#dc2626]"/> Contact Us</button>
            </div>
         </div>
@@ -105,23 +100,13 @@ export default function Home() {
       {/* SEARCH OVERLAY */}
       <div className="max-w-6xl mx-auto px-4 -mt-12 md:-mt-16 relative z-30">
         <div className="bg-white p-6 rounded-[32px] shadow-2xl border border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-          <div className="text-left">
-            <label className="text-[10px] font-black uppercase text-slate-400 px-4 mb-2 block tracking-widest">Brand</label>
-            <select value={searchMake} onChange={(e) => setSearchMake(e.target.value)} className="w-full bg-slate-50 p-5 rounded-2xl font-bold outline-none border border-slate-100 cursor-pointer"><option>All Brands</option><option>Mercedes-Benz</option><option>Scania</option><option>Volvo</option><option>DAF</option><option>Iveco</option></select>
-          </div>
-          <div className="text-left">
-            <label className="text-[10px] font-black uppercase text-slate-400 px-4 mb-2 block tracking-widest">Vehicle Type</label>
-            <select value={searchType} onChange={(e) => setSearchType(e.target.value)} className="w-full bg-slate-50 p-5 rounded-2xl font-bold outline-none border border-slate-100 cursor-pointer"><option>All Types</option><option>Tractor Units</option><option>Tipper</option><option>Rigids</option><option>Trailers</option></select>
-          </div>
-          <div className="pt-6">
-            <button onClick={handleHomeSearch} className="w-full bg-[#dc2626] text-white p-5 rounded-2xl font-black flex items-center justify-center gap-3 hover:bg-red-700 transition shadow-lg shadow-red-200">
-              <Search size={22} /> Search Now
-            </button>
-          </div>
+          <select value={searchMake} onChange={(e) => setSearchMake(e.target.value)} className="bg-slate-50 p-5 rounded-2xl font-bold outline-none border border-slate-100"><option>All Brands</option><option>Mercedes-Benz</option><option>Scania</option><option>Volvo</option></select>
+          <select value={searchType} onChange={(e) => setSearchType(e.target.value)} className="bg-slate-50 p-5 rounded-2xl font-bold outline-none border border-slate-100"><option>All Types</option><option>Tractor Units</option><option>Tipper</option></select>
+          <button onClick={handleHomeSearch} className="bg-[#dc2626] text-white p-5 rounded-2xl font-black flex items-center justify-center gap-3 hover:bg-red-700 transition shadow-lg"><Search size={22} /> Search Now</button>
         </div>
       </div>
 
-      {/* BRANDS SECTION */}
+      {/* BRANDS SECTION - UPDATED WITH REAL IMAGES */}
       <section className="max-w-7xl mx-auto px-4 py-24 text-left">
         <span className="text-[#dc2626] font-black uppercase tracking-[0.4em] text-[10px] block mb-3">Trusted Manufacturers</span>
         <h2 className="text-5xl font-black tracking-tighter text-[#0f172a] mb-12 italic uppercase">Premium Brands We Stock</h2>
@@ -129,14 +114,15 @@ export default function Home() {
            {BRAND_LOGOS.map(brand => (
              <div key={brand.name} className="bg-white h-40 rounded-[2.5rem] border border-slate-100 flex flex-col items-center justify-center shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group p-6">
                 <img 
-                  src={`https://logo.clearbit.com/${brand.domain}?size=128`} 
+                  src={brand.url} 
                   alt={brand.name} 
-                  className="h-16 w-auto object-contain mb-4 transition-all duration-500" 
+                  className="h-16 w-auto object-contain mb-4 transition-all duration-500 grayscale group-hover:grayscale-0" 
                   onError={(e) => {
                     e.target.style.display = 'none';
                     e.target.nextSibling.style.display = 'flex';
                   }}
                 />
+                {/* Fallback Letter if image fails */}
                 <div className="hidden w-12 h-12 bg-slate-50 rounded-full items-center justify-center font-black text-[#0f172a] mb-4 group-hover:bg-[#dc2626] group-hover:text-white transition-colors">
                   {brand.name[0]}
                 </div>

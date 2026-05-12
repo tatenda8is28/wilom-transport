@@ -20,7 +20,7 @@ export default function Footer() {
               
             </div>
             <p className="text-slate-400 font-medium mb-8 leading-relaxed">
-              Registered company supplying Southern Africa with premium, affordable MAN units and trailers.
+              Registered company supplying  with premium , affordable vehicles shipping to right-hand drive nations across the Southern African region(SADC) with full documentation and port logistics support.
             </p>
             
             {/* SOCIAL LINKS - Using icons we know work */}
@@ -29,7 +29,7 @@ export default function Footer() {
                 <Video size={20} />
               </a>
               <a href="https://wa.me/263788286326" target="_blank" rel="noreferrer" className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center hover:bg-[#25d366] transition-all text-white border border-white/5">
-                <MessageCircle size={20} />
+                <MessageCircle size={20} /> 
               </a>
               <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-white border border-white/5">
                 <Globe size={20} />
@@ -44,7 +44,7 @@ export default function Footer() {
               <li><Link to="/inventory" className="hover:text-[#dc2626] transition">Inventory</Link></li>
               <li><Link to="/about" className="hover:text-[#dc2626] transition">About Us</Link></li>
               <li><Link to="/how-it-works" className="hover:text-[#dc2626] transition">How it works</Link></li>
-              <li><Link to="/admin" className="text-[#dc2626] flex items-center gap-2 hover:text-white transition"><Lock size={12}/> Command Center</Link></li>
+              <li><Link to="/admin" className="text-[#dc2626] flex items-center gap-2 hover:text-white transition"><Lock size={12}/> Admin Login</Link></li>
             </ul>
           </div>
 
@@ -52,9 +52,10 @@ export default function Footer() {
           <div>
             <h4 className="font-black text-xs uppercase tracking-[0.3em] mb-8 text-white/50">Core Catalog</h4>
             <ul className="space-y-4 font-bold text-slate-300 uppercase text-[11px] tracking-widest cursor-default">
-              <li className="hover:text-white">MAN Tractor Units</li>
+              <li className="hover:text-white">Tractor Units</li>
               <li className="hover:text-white">Rigids & Tippers</li>
               <li className="hover:text-white">Trailers & Parts</li>
+              <li className="hover:text-white">Refridgerators</li>
             </ul>
           </div>
 

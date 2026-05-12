@@ -10,18 +10,18 @@ export default function AdminStock() {
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [inventory, setInventory] = useState([]);
-  const [mainImage, setMainImage] = useState(null);
-  const [galleryFiles, setGalleryFiles] = useState([]); // Bulk images
+  const [mainImageFile, setMainImageFile] = useState(null);
+  const [galleryFiles, setGalleryFiles] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [currentId, setCurrentId] = useState(null);
 
   const initialFormState = {
     make: 'Mercedes-Benz', model: '', year: 2024, body_type: 'Tractor Units',
     vin: '', registration: '', mileage_miles: '', uk_price_gbp: '',
-    delivered_price_usd: '', axle_config: '6x2', horsepower: '',
+    delivered_price_usd: '', axle_config: '', horsepower: '',
     gearbox: 'Automatic', emissions_class: 'Euro 6', cab_type: 'Sleeper Cab',
     mot_expiry: '', location: 'UK', status: 'Available', badge: 'Fresh Arrival',
-    description: ''
+    description: '' // Added field
   };
 
   const [formData, setFormData] = useState(initialFormState);
@@ -49,8 +49,8 @@ export default function AdminStock() {
     }
   };
 
-  const uploadFile = async (file) => {
-    const fileName = `${Date.now()}-${file.name}`;
+  const uploadToStorage = async (file) => {
+    const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, '')}`;
     const { error } = await supabase.storage.from('vehicle-images').upload(fileName, file);
     if (error) throw error;
     const { data } = supabase.storage.from('vehicle-images').getPublicUrl(fileName);
@@ -61,33 +61,24 @@ export default function AdminStock() {
     e.preventDefault();
     setLoading(true);
     try {
-      let publicMainImage = formData.main_image;
-      let publicGalleryUrls = formData.image_gallery || [];
+      let mainImageUrl = formData.main_image;
+      let galleryUrls = formData.image_gallery || [];
 
-      // 1. Upload Main Image
-      if (mainImage) {
-        publicMainImage = await uploadFile(mainImage);
-      }
-
-      // 2. Upload Gallery Images (Bulk)
+      if (mainImageFile) mainImageUrl = await uploadToStorage(mainImageFile);
       if (galleryFiles.length > 0) {
-        const uploadPromises = Array.from(galleryFiles).map(file => uploadFile(file));
-        const newUrls = await Promise.all(uploadPromises);
-        publicGalleryUrls = [...publicGalleryUrls, ...newUrls];
+        const uploadPromises = Array.from(galleryFiles).map(file => uploadToStorage(file));
+        const newGalleryUrls = await Promise.all(uploadPromises);
+        galleryUrls = [...galleryUrls, ...newGalleryUrls];
       }
-
-      // 3. Auto-generate Stock Number (if not editing)
-      const stockNo = isEditing ? formData.stock_number : `WTS-${Math.floor(1000 + Math.random() * 9000)}`;
 
       const payload = {
         ...formData,
-        stock_number: stockNo,
         year: parseInt(formData.year),
         mileage_miles: parseInt(formData.mileage_miles) || 0,
         uk_price_gbp: parseFloat(formData.uk_price_gbp),
         delivered_price_usd: parseFloat(formData.delivered_price_usd),
-        main_image: publicMainImage,
-        image_gallery: publicGalleryUrls,
+        main_image: mainImageUrl,
+        image_gallery: galleryUrls,
         mot_expiry: formData.mot_expiry === "" ? null : formData.mot_expiry 
       };
 
@@ -99,8 +90,6 @@ export default function AdminStock() {
 
       setShowForm(false);
       setIsEditing(false);
-      setMainImage(null);
-      setGalleryFiles([]);
       setFormData(initialFormState);
       fetchInventory();
     } catch (err) { alert(err.message); } finally { setLoading(false); }
@@ -118,12 +107,10 @@ export default function AdminStock() {
         </button>
       </header>
 
-      {/* TABLE */}
       <div className="bg-white rounded-[40px] border border-slate-100 shadow-sm overflow-x-auto text-left">
-        <table className="w-full min-w-[900px]">
+        <table className="w-full min-w-[800px]">
           <thead>
             <tr className="bg-slate-50 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
-              <th className="px-10 py-6 text-left">Stock #</th>
               <th className="px-10 py-6 text-left">Vehicle Details</th>
               <th className="px-10 py-6 text-center">Transmission</th>
               <th className="px-10 py-6 text-right">ZIM Price</th>
@@ -133,7 +120,6 @@ export default function AdminStock() {
           <tbody className="font-bold text-sm text-slate-600">
             {inventory.map((item) => (
               <tr key={item.id} className="border-b border-slate-50">
-                <td className="px-10 py-8 font-black text-[#0f172a] text-xs tracking-tighter">#{item.stock_number}</td>
                 <td className="px-10 py-8 flex items-center gap-4">
                   <img src={item.main_image} className="w-16 h-12 object-cover rounded-xl bg-slate-50" />
                   <div className="flex flex-col"><span className="text-[#0f172a] font-black">{item.make} {item.model}</span><span className="text-[10px] text-slate-400 uppercase tracking-widest">{item.vin}</span></div>
@@ -163,58 +149,61 @@ export default function AdminStock() {
                 
                 {/* COLUMN 1 */}
                 <div className="space-y-6">
-                  <h3 className="font-black text-[11px] uppercase tracking-[0.2em] text-slate-400 border-b pb-3 flex items-center gap-2"><span className="w-1.5 h-1.5 bg-[#dc2626] rounded-full"></span> Core Identity</h3>
-                  <div><label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">MAKE</label><select name="make" value={formData.make} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-bold">{MAKES.map(m => <option key={m}>{m}</option>)}</select></div>
-                  <div><label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">MODEL NAME</label><input required name="model" value={formData.model} onChange={handleInputChange} type="text" className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-bold" /></div>
-                  <div><label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">BODY TYPE</label><select name="body_type" value={formData.body_type} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-bold">{BODY_TYPES.map(t => <option key={t}>{t}</option>)}</select></div>
+                  <h3 className="font-black text-[11px] uppercase tracking-[0.2em] text-slate-400 border-b pb-3 flex items-center gap-2"><span className="w-1.5 h-1.5 bg-[#dc2626] rounded-full"></span> CORE IDENTITY</h3>
+                  <select name="make" value={formData.make} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-bold">{MAKES.map(m => <option key={m}>{m}</option>)}</select>
+                  <input required name="model" value={formData.model} onChange={handleInputChange} type="text" placeholder="MODEL NAME" className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-bold" />
+                  <select name="body_type" value={formData.body_type} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-bold">{BODY_TYPES.map(t => <option key={t}>{t}</option>)}</select>
                   <div className="grid grid-cols-2 gap-4">
-                    <div><label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">YEAR</label><input name="year" value={formData.year} onChange={handleInputChange} type="number" className="w-full bg-slate-50 p-4 rounded-2xl font-bold" /></div>
-                    <div><label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">MILES</label><input name="mileage_miles" value={formData.mileage_miles} onChange={handleInputChange} type="number" className="w-full bg-slate-50 p-4 rounded-2xl font-bold" /></div>
+                    <input name="year" value={formData.year} onChange={handleInputChange} type="number" placeholder="YEAR" className="w-full bg-slate-50 p-4 rounded-2xl font-bold" />
+                    <input name="mileage_miles" value={formData.mileage_miles} onChange={handleInputChange} type="number" placeholder="MILES" className="w-full bg-slate-50 p-4 rounded-2xl font-bold" />
+                  </div>
+                  {/* DESCRIPTION FIELD ADDED HERE */}
+                  <div>
+                    <label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">DESCRIPTION</label>
+                    <textarea name="description" value={formData.description} onChange={handleInputChange} rows="4" className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-bold outline-none focus:border-[#dc2626]" placeholder="Add technical details, condition notes, etc."></textarea>
                   </div>
                 </div>
 
                 {/* COLUMN 2 */}
                 <div className="space-y-6">
-                  <h3 className="font-black text-[11px] uppercase tracking-[0.2em] text-slate-400 border-b pb-3 flex items-center gap-2"><span className="w-1.5 h-1.5 bg-[#dc2626] rounded-full"></span> Technical Specs</h3>
-                  <div><label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">GEARBOX</label><select name="gearbox" value={formData.gearbox} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-bold">{GEARBOXES.map(g => <option key={g}>{g}</option>)}</select></div>
-                  <div><label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">VIN NUMBER</label><input name="vin" value={formData.vin} onChange={handleInputChange} type="text" className="w-full bg-slate-50 p-4 rounded-2xl font-bold" /></div>
+                  <h3 className="font-black text-[11px] uppercase tracking-[0.2em] text-slate-400 border-b pb-3 flex items-center gap-2"><span className="w-1.5 h-1.5 bg-[#dc2626] rounded-full"></span> TECHNICAL SPECS</h3>
+                  <select name="gearbox" value={formData.gearbox} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-bold">{GEARBOXES.map(g => <option key={g}>{g}</option>)}</select>
+                  <input name="vin" value={formData.vin} onChange={handleInputChange} type="text" placeholder="VIN NUMBER" className="w-full bg-slate-50 p-4 rounded-2xl font-bold" />
                   <div className="grid grid-cols-2 gap-4">
-                    <div><label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">AXLE</label><input name="axle_config" value={formData.axle_config} onChange={handleInputChange} type="text" className="w-full bg-slate-50 p-4 rounded-2xl font-bold" /></div>
-                    <div><label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">POWER</label><input name="horsepower" value={formData.horsepower} onChange={handleInputChange} type="text" className="w-full bg-slate-50 p-4 rounded-2xl font-bold" /></div>
+                    <input name="axle_config" value={formData.axle_config} onChange={handleInputChange} type="text" placeholder="AXLE" className="w-full bg-slate-50 p-4 rounded-2xl font-bold" />
+                    <input name="horsepower" value={formData.horsepower} onChange={handleInputChange} type="text" placeholder="POWER" className="w-full bg-slate-50 p-4 rounded-2xl font-bold" />
                   </div>
-                  <div><label className="text-[10px] font-black uppercase text-slate-400 mb-2 block text-blue-600">LOCATION</label><select name="location" value={formData.location} onChange={handleInputChange} className="w-full bg-blue-50/50 border border-blue-100 p-4 rounded-2xl font-bold text-blue-900"><option value="UK">UK (Stock)</option><option value="In Transit">In Transit</option><option value="Zimbabwe">Zimbabwe</option></select></div>
+                  <input name="mot_expiry" value={formData.mot_expiry} onChange={handleInputChange} type="date" className="w-full bg-slate-50 p-4 rounded-2xl font-bold" />
+                  <select name="location" value={formData.location} onChange={handleInputChange} className="w-full bg-blue-50/50 border border-blue-100 p-4 rounded-2xl font-bold text-blue-900"><option value="UK">UK (Stock)</option><option value="In Transit">In Transit</option><option value="Zimbabwe">Zimbabwe</option></select>
                 </div>
 
                 {/* COLUMN 3 */}
                 <div className="space-y-6">
-                  <h3 className="font-black text-[11px] uppercase tracking-[0.2em] text-slate-400 border-b pb-3 flex items-center gap-2"><span className="w-1.5 h-1.5 bg-[#dc2626] rounded-full"></span> Pricing & Gallery</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div><label className="text-[10px] font-black text-slate-400 mb-2 block">UK (£)</label><input name="uk_price_gbp" value={formData.uk_price_gbp} onChange={handleInputChange} type="number" className="w-full bg-slate-50 p-4 rounded-2xl font-bold" /></div>
-                    <div><label className="text-[10px] font-black text-slate-400 mb-2 block">ZIM ($)</label><input name="delivered_price_usd" value={formData.delivered_price_usd} onChange={handleInputChange} type="number" className="w-full bg-slate-50 p-4 rounded-2xl font-bold text-[#dc2626]" /></div>
+                  <h3 className="font-black text-[11px] uppercase tracking-[0.2em] text-slate-400 border-b pb-3 flex items-center gap-2"><span className="w-1.5 h-1.5 bg-[#dc2626] rounded-full"></span> PRICING & MEDIA</h3>
+                  <div className="grid grid-cols-2 gap-4 text-left">
+                    <div><label className="text-[10px] font-black text-slate-400 mb-1 block">UK (£)</label><input name="uk_price_gbp" value={formData.uk_price_gbp} onChange={handleInputChange} type="number" className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-bold" /></div>
+                    <div><label className="text-[10px] font-black text-slate-400 mb-1 block">ZIM ($)</label><input name="delivered_price_usd" value={formData.delivered_price_usd} onChange={handleInputChange} type="number" className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-bold text-[#dc2626]" /></div>
                   </div>
+                  <select name="status" value={formData.status} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-bold"><option value="Available">Available</option><option value="Reserved">Reserved</option><option value="Sold">Sold</option></select>
                   
-                  {/* MAIN PHOTO */}
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="text-[9px] font-black uppercase text-slate-400 mb-2 block">MAIN PHOTO</label>
-                      <input type="file" onChange={(e) => setMainImage(e.target.files[0])} className="hidden" id="f-main" />
-                      <label htmlFor="f-main" className="border-2 border-dashed border-slate-100 rounded-xl p-4 text-center cursor-pointer flex flex-col items-center justify-center bg-slate-50 hover:bg-slate-100 transition-all">
-                        <Upload size={16} className="mb-1 opacity-50"/>
-                        <span className="text-[8px] font-black uppercase">{mainImage ? 'Change' : 'Upload'}</span>
+                      <input type="file" onChange={(e) => setMainImageFile(e.target.files[0])} className="hidden" id="f-main" />
+                      <label htmlFor="f-main" className="border-2 border-dashed border-slate-100 rounded-3xl p-6 text-center cursor-pointer flex flex-col items-center gap-2 bg-slate-50 hover:bg-slate-100 transition">
+                        <Upload size={20} className="opacity-20"/>
+                        <span className="text-[8px] font-black uppercase">Main Photo</span>
                       </label>
                     </div>
-                    {/* BULK GALLERY */}
                     <div>
-                      <label className="text-[9px] font-black uppercase text-slate-400 mb-2 block">GALLERY (BULK)</label>
-                      <input type="file" multiple onChange={(e) => setGalleryFiles(e.target.files)} className="hidden" id="f-gallery" />
-                      <label htmlFor="f-gallery" className="border-2 border-dashed border-slate-100 rounded-xl p-4 text-center cursor-pointer flex flex-col items-center justify-center bg-slate-50 hover:bg-slate-100 transition-all">
-                        <ImageIcon size={16} className="mb-1 opacity-50"/>
-                        <span className="text-[8px] font-black uppercase">{galleryFiles.length > 0 ? `${galleryFiles.length} files` : 'Bulk Pick'}</span>
+                      <input type="file" multiple onChange={(e) => setGalleryFiles(e.target.files)} className="hidden" id="f-bulk" />
+                      <label htmlFor="f-bulk" className="border-2 border-dashed border-slate-100 rounded-3xl p-6 text-center cursor-pointer flex flex-col items-center gap-2 bg-slate-50 hover:bg-slate-100 transition">
+                        <ImageIcon size={20} className="opacity-20"/>
+                        <span className="text-[8px] font-black uppercase">Bulk Gallery</span>
                       </label>
                     </div>
                   </div>
 
-                  <button disabled={loading} className="w-full bg-[#dc2626] text-white py-6 rounded-[28px] font-black text-xl mt-4 shadow-xl flex items-center justify-center gap-3">
+                  <button disabled={loading} className="w-full bg-[#dc2626] text-white py-6 rounded-[28px] font-black text-xl mt-4 shadow-xl flex items-center justify-center gap-3 transition">
                     {loading ? <Loader2 className="animate-spin" /> : (isEditing ? 'SAVE CHANGES' : 'PUBLISH LISTING')}
                   </button>
                 </div>
