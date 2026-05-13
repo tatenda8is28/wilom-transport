@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { supabase } from './api/supabase';
 
-// Components
+// Layout Components
 import Navbar from './components/common/Navbar';
 import Footer from './components/common/Footer';
 
@@ -12,12 +12,14 @@ import Inventory from './pages/public/Inventory';
 import About from './pages/public/About';
 import HowItWorks from './pages/public/HowItWorks';
 import VehicleDetails from './pages/public/VehicleDetails';
+import Privacy from './pages/public/Privacy';
+import Terms from './pages/public/Terms';
 
-// Admin Pages
+// Admin & Auth Pages
 import Dashboard from './pages/admin/Dashboard';
 import Login from './pages/admin/Login';
 
-// Protected Route Logic
+// Component to protect Admin routes
 function ProtectedRoute({ children, session }) {
   if (!session) {
     return <Navigate to="/login" replace />;
@@ -25,7 +27,7 @@ function ProtectedRoute({ children, session }) {
   return children;
 }
 
-// Layout Wrapper to hide/show Navigation
+// Layout wrapper to handle nav/footer visibility
 function Layout({ children, session }) {
   const location = useLocation();
   const isAdminPath = location.pathname.startsWith('/admin');
@@ -33,8 +35,11 @@ function Layout({ children, session }) {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
+      {/* Hide public Navbar/Footer on Admin and Login pages */}
       {!isAdminPath && !isLoginPage && <Navbar />}
-      <main className="grow">{children}</main>
+      <main className="grow">
+        {children}
+      </main>
       {!isAdminPath && !isLoginPage && <Footer />}
     </div>
   );
@@ -45,13 +50,13 @@ export default function App() {
   const [initializing, setInitializing] = useState(true);
 
   useEffect(() => {
-    // Check for existing session
+    // 1. Check for initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setInitializing(false);
     });
 
-    // Listen for Auth changes
+    // 2. Listen for Auth changes (Login/Logout)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
@@ -59,6 +64,7 @@ export default function App() {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Show nothing or a loading spinner while checking auth status
   if (initializing) return null;
 
   return (
@@ -73,10 +79,14 @@ export default function App() {
           <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/vehicle/:id" element={<VehicleDetails />} />
           
-          {/* AUTH ROUTE */}
+          {/* LEGAL ROUTES */}
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          
+          {/* AUTHENTICATION */}
           <Route path="/login" element={<Login />} />
 
-          {/* PROTECTED ADMIN ROUTES */}
+          {/* PROTECTED COMMAND CENTER ROUTES */}
           <Route 
             path="/admin/*" 
             element={

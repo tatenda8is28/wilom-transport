@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, X, Upload, Loader2, Info, BadgeDollarSign, Cog, Trash2, Edit3, Image as ImageIcon } from 'lucide-react';
+import { Plus, X, Upload, Loader2, Info, BadgeDollarSign, Cog, Trash2, Edit3, Image as ImageIcon, CheckCircle2 } from 'lucide-react';
 import { supabase } from '../../api/supabase';
 
 const BODY_TYPES = ["Rigids", "Tractor Units", "Box van", "Chassis Cab", "Crane Truck", "Curtain sided", "Dropside", "Flatbeds", "Tipper", "Trailers"];
@@ -10,8 +10,12 @@ export default function AdminStock() {
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [inventory, setInventory] = useState([]);
+  
+  // FILE STATES
   const [mainImageFile, setMainImageFile] = useState(null);
+  const [mainPreview, setMainPreview] = useState(null); // Live preview URL
   const [galleryFiles, setGalleryFiles] = useState([]);
+
   const [isEditing, setIsEditing] = useState(false);
   const [currentId, setCurrentId] = useState(null);
 
@@ -21,7 +25,7 @@ export default function AdminStock() {
     delivered_price_usd: '', axle_config: '', horsepower: '',
     gearbox: 'Automatic', emissions_class: 'Euro 6', cab_type: 'Sleeper Cab',
     mot_expiry: '', location: 'UK', status: 'Available', badge: 'Fresh Arrival',
-    description: '' // Added field
+    description: ''
   };
 
   const [formData, setFormData] = useState(initialFormState);
@@ -34,6 +38,15 @@ export default function AdminStock() {
   }
 
   const handleInputChange = (e) => { setFormData({ ...formData, [e.target.name]: e.target.value }); };
+
+  // HANDLE MAIN PHOTO SELECTION
+  const handleMainPhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setMainImageFile(file);
+      setMainPreview(URL.createObjectURL(file)); // Generate local preview URL
+    }
+  };
 
   const handleEdit = (item) => {
     setFormData(item);
@@ -61,7 +74,7 @@ export default function AdminStock() {
     e.preventDefault();
     setLoading(true);
     try {
-      let mainImageUrl = formData.main_image;
+      let mainImageUrl = formData.main_image || '';
       let galleryUrls = formData.image_gallery || [];
 
       if (mainImageFile) mainImageUrl = await uploadToStorage(mainImageFile);
@@ -90,8 +103,12 @@ export default function AdminStock() {
 
       setShowForm(false);
       setIsEditing(false);
+      setMainImageFile(null);
+      setMainPreview(null);
+      setGalleryFiles([]);
       setFormData(initialFormState);
       fetchInventory();
+      alert("SUCCESS: Vehicle is Live!");
     } catch (err) { alert(err.message); } finally { setLoading(false); }
   };
 
@@ -99,14 +116,15 @@ export default function AdminStock() {
     <div className="space-y-12">
       <header className="flex justify-between items-center text-left">
         <div>
-          <h1 className="text-4xl font-black text-[#0f172a] tracking-tight uppercase italic">Stock Manager</h1>
-          <p className="text-slate-400 font-bold mt-2 text-sm uppercase tracking-widest">Update, Edit, or Delete inventory.</p>
+          <h1 className="text-4xl font-black text-[#0f172a] tracking-tight uppercase italic leading-none">Stock <span className="text-[#dc2626]">Manager</span></h1>
+          <p className="text-slate-400 font-bold mt-2 text-sm uppercase">Manage your fleet inventory</p>
         </div>
-        <button onClick={() => { setIsEditing(false); setFormData(initialFormState); setShowForm(true); }} className="bg-[#dc2626] text-white px-8 py-4 rounded-2xl font-black flex items-center gap-3 hover:bg-red-700 transition shadow-xl">
+        <button onClick={() => { setIsEditing(false); setFormData(initialFormState); setMainPreview(null); setShowForm(true); }} className="bg-[#dc2626] text-white px-8 py-4 rounded-2xl font-black flex items-center gap-3 hover:bg-red-700 transition shadow-xl">
           <Plus size={20} /> List New Vehicle
         </button>
       </header>
 
+      {/* TABLE */}
       <div className="bg-white rounded-[40px] border border-slate-100 shadow-sm overflow-x-auto text-left">
         <table className="w-full min-w-[800px]">
           <thead>
@@ -138,11 +156,11 @@ export default function AdminStock() {
         </table>
       </div>
 
+      {/* FORM MODAL */}
       {showForm && (
         <div className="fixed inset-0 bg-[#0f172a]/95 backdrop-blur-md z-[100] flex items-center justify-center p-4">
            <div className="bg-white w-full max-w-6xl rounded-[48px] p-10 md:p-14 relative max-h-[95vh] overflow-y-auto shadow-2xl">
               <button onClick={() => setShowForm(false)} className="absolute top-10 right-10 text-slate-400 hover:text-[#dc2626] transition"><X size={36}/></button>
-              
               <h2 className="text-5xl font-black mb-14 text-[#0f172a] text-left uppercase italic tracking-tighter">{isEditing ? 'Edit Vehicle' : 'List New Vehicle'}</h2>
               
               <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-12 text-left">
@@ -157,11 +175,7 @@ export default function AdminStock() {
                     <input name="year" value={formData.year} onChange={handleInputChange} type="number" placeholder="YEAR" className="w-full bg-slate-50 p-4 rounded-2xl font-bold" />
                     <input name="mileage_miles" value={formData.mileage_miles} onChange={handleInputChange} type="number" placeholder="MILES" className="w-full bg-slate-50 p-4 rounded-2xl font-bold" />
                   </div>
-                  {/* DESCRIPTION FIELD ADDED HERE */}
-                  <div>
-                    <label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">DESCRIPTION</label>
-                    <textarea name="description" value={formData.description} onChange={handleInputChange} rows="4" className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-bold outline-none focus:border-[#dc2626]" placeholder="Add technical details, condition notes, etc."></textarea>
-                  </div>
+                  <textarea name="description" value={formData.description} onChange={handleInputChange} rows="4" placeholder="Add technical details, condition notes, etc." className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-bold outline-none focus:border-[#dc2626]"></textarea>
                 </div>
 
                 {/* COLUMN 2 */}
@@ -177,33 +191,42 @@ export default function AdminStock() {
                   <select name="location" value={formData.location} onChange={handleInputChange} className="w-full bg-blue-50/50 border border-blue-100 p-4 rounded-2xl font-bold text-blue-900"><option value="UK">UK (Stock)</option><option value="In Transit">In Transit</option><option value="Zimbabwe">Zimbabwe</option></select>
                 </div>
 
-                {/* COLUMN 3 */}
+                {/* COLUMN 3: UPDATED MEDIA VISUAL FEEDBACK */}
                 <div className="space-y-6">
                   <h3 className="font-black text-[11px] uppercase tracking-[0.2em] text-slate-400 border-b pb-3 flex items-center gap-2"><span className="w-1.5 h-1.5 bg-[#dc2626] rounded-full"></span> PRICING & MEDIA</h3>
-                  <div className="grid grid-cols-2 gap-4 text-left">
-                    <div><label className="text-[10px] font-black text-slate-400 mb-1 block">UK (£)</label><input name="uk_price_gbp" value={formData.uk_price_gbp} onChange={handleInputChange} type="number" className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-bold" /></div>
-                    <div><label className="text-[10px] font-black text-slate-400 mb-1 block">ZIM ($)</label><input name="delivered_price_usd" value={formData.delivered_price_usd} onChange={handleInputChange} type="number" className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-bold text-[#dc2626]" /></div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div><label className="text-[10px] font-black text-slate-400 mb-2 block uppercase">UK (£)</label><input name="uk_price_gbp" value={formData.uk_price_gbp} onChange={handleInputChange} type="number" className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-bold" /></div>
+                    <div><label className="text-[10px] font-black text-slate-400 mb-2 block uppercase">ZIM ($)</label><input name="delivered_price_usd" value={formData.delivered_price_usd} onChange={handleInputChange} type="number" className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-bold text-[#dc2626]" /></div>
                   </div>
                   <select name="status" value={formData.status} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-bold"><option value="Available">Available</option><option value="Reserved">Reserved</option><option value="Sold">Sold</option></select>
                   
                   <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <input type="file" onChange={(e) => setMainImageFile(e.target.files[0])} className="hidden" id="f-main" />
-                      <label htmlFor="f-main" className="border-2 border-dashed border-slate-100 rounded-3xl p-6 text-center cursor-pointer flex flex-col items-center gap-2 bg-slate-50 hover:bg-slate-100 transition">
-                        <Upload size={20} className="opacity-20"/>
-                        <span className="text-[8px] font-black uppercase">Main Photo</span>
+                    {/* MAIN PHOTO BOX - WITH PREVIEW */}
+                    <div className="relative group">
+                      <input type="file" accept="image/*" onChange={handleMainPhotoChange} className="hidden" id="f-main" />
+                      <label htmlFor="f-main" className={`border-2 border-dashed rounded-3xl p-6 h-32 flex flex-col items-center justify-center cursor-pointer transition-all overflow-hidden ${mainImageFile ? 'border-[#22c55e] bg-green-50' : 'border-slate-100 bg-slate-50 hover:bg-slate-100'}`}>
+                        {mainPreview ? (
+                            <img src={mainPreview} className="w-full h-full object-cover rounded-xl" alt="preview" />
+                        ) : (
+                            <><Upload size={20} className="opacity-20 mb-1"/><span className="text-[8px] font-black uppercase text-slate-400">Main Photo</span></>
+                        )}
+                        {mainImageFile && <div className="absolute top-2 right-2 bg-[#22c55e] text-white rounded-full p-0.5"><CheckCircle2 size={12}/></div>}
                       </label>
                     </div>
-                    <div>
-                      <input type="file" multiple onChange={(e) => setGalleryFiles(e.target.files)} className="hidden" id="f-bulk" />
-                      <label htmlFor="f-bulk" className="border-2 border-dashed border-slate-100 rounded-3xl p-6 text-center cursor-pointer flex flex-col items-center gap-2 bg-slate-50 hover:bg-slate-100 transition">
-                        <ImageIcon size={20} className="opacity-20"/>
-                        <span className="text-[8px] font-black uppercase">Bulk Gallery</span>
+
+                    {/* BULK GALLERY BOX - WITH COUNT */}
+                    <div className="relative">
+                      <input type="file" multiple accept="image/*" onChange={(e) => setGalleryFiles(e.target.files)} className="hidden" id="f-bulk" />
+                      <label htmlFor="f-bulk" className={`border-2 border-dashed rounded-3xl p-6 h-32 flex flex-col items-center justify-center cursor-pointer transition-all ${galleryFiles.length > 0 ? 'border-blue-500 bg-blue-50' : 'border-slate-100 bg-slate-50 hover:bg-slate-100'}`}>
+                        <ImageIcon size={20} className={`${galleryFiles.length > 0 ? 'text-blue-500' : 'opacity-20'} mb-1`}/>
+                        <span className={`text-[8px] font-black uppercase ${galleryFiles.length > 0 ? 'text-blue-600' : 'text-slate-400'}`}>
+                            {galleryFiles.length > 0 ? `${galleryFiles.length} Images Selected` : 'Bulk Gallery'}
+                        </span>
                       </label>
                     </div>
                   </div>
 
-                  <button disabled={loading} className="w-full bg-[#dc2626] text-white py-6 rounded-[28px] font-black text-xl mt-4 shadow-xl flex items-center justify-center gap-3 transition">
+                  <button disabled={loading} className="w-full bg-[#dc2626] text-white py-6 rounded-[28px] font-black text-xl mt-4 shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-all disabled:opacity-50">
                     {loading ? <Loader2 className="animate-spin" /> : (isEditing ? 'SAVE CHANGES' : 'PUBLISH LISTING')}
                   </button>
                 </div>
