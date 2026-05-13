@@ -3,19 +3,21 @@ import { useNavigate, Link } from 'react-router-dom';
 import { 
   ArrowRight, Phone, Gauge, Calendar, 
   MapPin, Search, ChevronDown, Loader2, 
-  Settings2, Truck, Anchor, Eye 
+  MessageCircle, Settings2, Truck, Anchor, Eye 
 } from 'lucide-react';
 import { supabase } from '../../api/supabase';
 
-// BRAND DATA WITH REAL LOGOS
+// NEW BRAND DATA USING YOUR LOCAL FILES
 const BRAND_LOGOS = [
-  { name: 'MAN', url: 'https://www.car-logos.org/wp-content/uploads/2011/09/man.png' },
-  { name: 'SCANIA', url: 'https://www.car-logos.org/wp-content/uploads/2011/09/scania.png' },
-  { name: 'VOLVO', url: 'https://www.car-logos.org/wp-content/uploads/2011/09/volvo.png' },
-  { name: 'MERCEDES', url: 'https://www.car-logos.org/wp-content/uploads/2011/09/mercedes.png' },
-  { name: 'DAF', url: 'https://logo.clearbit.com/daf.com' },
-  { name: 'FORD', url: 'https://www.car-logos.org/wp-content/uploads/2011/09/ford.png' },
-  { name: 'IVECO', url: 'https://logo.clearbit.com/iveco.com' },
+  { name: 'MAN', src: '/brand-man.png' },
+  { name: 'SCANIA', src: '/brand-scania.png' },
+  { name: 'VOLVO', src: '/brand-volvo.png' },
+  { name: 'MERCEDES', src: '/brand-mercedes.png' },
+  { name: 'DAF', src: '/brand-daf.png' },
+  { name: 'IVECO', src: '/brand-iveco.png' },
+  { name: 'RENAULT', src: '/brand-renault.png' },
+  { name: 'TOYOTA', src: '/brand-toyota.png' },
+  { name: 'KUBOTA', src: '/brand-kubota.png' },
 ];
 
 function VehicleCard({ vehicle }) {
@@ -30,10 +32,10 @@ function VehicleCard({ vehicle }) {
         <h3 className="font-black text-3xl text-[#0f172a] leading-none mb-2 uppercase italic">{vehicle.make}</h3>
         <p className="text-slate-400 font-bold text-lg mb-6 uppercase">{vehicle.model}</p>
         <div className="grid grid-cols-2 gap-4 text-[10px] font-black text-slate-400 uppercase tracking-tighter mb-10 pt-6 border-t border-slate-50">
-           <div className="flex items-center gap-2"><Calendar size={14}/> {vehicle.year} Model</div>
-           <div className="flex items-center gap-2"><Settings2 size={14}/> {vehicle.gearbox}</div>
-           <div className="flex items-center gap-2"><Truck size={14}/> {vehicle.axle_config}</div>
-           <div className="flex items-center gap-2"><Gauge size={14}/> {vehicle.mileage_miles?.toLocaleString()} Mi</div>
+           <div className="flex items-center gap-2 text-left"><Calendar size={14} className="text-slate-200"/> {vehicle.year} Model</div>
+           <div className="flex items-center gap-2 text-left"><Settings2 size={14} className="text-slate-200"/> {vehicle.gearbox}</div>
+           <div className="flex items-center gap-2 text-left"><Truck size={14} className="text-slate-200"/> {vehicle.axle_config}</div>
+           <div className="flex items-center gap-2 text-left"><Gauge size={14} className="text-slate-200"/> {vehicle.mileage_miles?.toLocaleString()} Mi</div>
         </div>
         <div className="flex justify-between items-end bg-slate-50 p-7 rounded-[2rem] mb-8">
           <div className="text-left">
@@ -100,33 +102,26 @@ export default function Home() {
       {/* SEARCH OVERLAY */}
       <div className="max-w-6xl mx-auto px-4 -mt-12 md:-mt-16 relative z-30">
         <div className="bg-white p-6 rounded-[32px] shadow-2xl border border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-          <select value={searchMake} onChange={(e) => setSearchMake(e.target.value)} className="bg-slate-50 p-5 rounded-2xl font-bold outline-none border border-slate-100"><option>All Brands</option><option>Mercedes-Benz</option><option>Scania</option><option>Volvo</option></select>
-          <select value={searchType} onChange={(e) => setSearchType(e.target.value)} className="bg-slate-50 p-5 rounded-2xl font-bold outline-none border border-slate-100"><option>All Types</option><option>Tractor Units</option><option>Tipper</option></select>
+          <select value={searchMake} onChange={(e) => setSearchMake(e.target.value)} className="bg-slate-50 p-5 rounded-2xl font-bold outline-none border border-slate-100 cursor-pointer"><option>All Brands</option><option>Mercedes-Benz</option><option>Scania</option><option>Volvo</option></select>
+          <select value={searchType} onChange={(e) => setSearchType(e.target.value)} className="bg-slate-50 p-5 rounded-2xl font-bold outline-none border border-slate-100 cursor-pointer"><option>All Types</option><option>Tractor Units</option><option>Tipper</option></select>
           <button onClick={handleHomeSearch} className="bg-[#dc2626] text-white p-5 rounded-2xl font-black flex items-center justify-center gap-3 hover:bg-red-700 transition shadow-lg"><Search size={22} /> Search Now</button>
         </div>
       </div>
 
-      {/* BRANDS SECTION - UPDATED WITH REAL IMAGES */}
+      {/* BRANDS SECTION - UPDATED WITH YOUR NEW IMAGES */}
       <section className="max-w-7xl mx-auto px-4 py-24 text-left">
         <span className="text-[#dc2626] font-black uppercase tracking-[0.4em] text-[10px] block mb-3">Trusted Manufacturers</span>
         <h2 className="text-5xl font-black tracking-tighter text-[#0f172a] mb-12 italic uppercase">Premium Brands We Stock</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
            {BRAND_LOGOS.map(brand => (
-             <div key={brand.name} className="bg-white h-40 rounded-[2.5rem] border border-slate-100 flex flex-col items-center justify-center shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group p-6">
+             <div key={brand.name} className="bg-white h-44 rounded-[3rem] border border-slate-100 flex flex-col items-center justify-center shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group p-8">
                 <img 
-                  src={brand.url} 
+                  src={brand.src} 
                   alt={brand.name} 
-                  className="h-16 w-auto object-contain mb-4 transition-all duration-500 grayscale group-hover:grayscale-0" 
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.nextSibling.style.display = 'flex';
-                  }}
+                  className="h-20 w-auto object-contain mb-4 transition-all duration-500 grayscale group-hover:grayscale-0" 
+                  onError={(e) => { e.target.style.opacity = '0.3' }}
                 />
-                {/* Fallback Letter if image fails */}
-                <div className="hidden w-12 h-12 bg-slate-50 rounded-full items-center justify-center font-black text-[#0f172a] mb-4 group-hover:bg-[#dc2626] group-hover:text-white transition-colors">
-                  {brand.name[0]}
-                </div>
-                <span className="text-[10px] font-black text-slate-400 group-hover:text-[#0f172a] tracking-widest uppercase">{brand.name}</span>
+                <span className="text-[11px] font-black text-slate-400 group-hover:text-[#dc2626] tracking-[0.2em] uppercase transition-colors">{brand.name}</span>
              </div>
            ))}
         </div>
