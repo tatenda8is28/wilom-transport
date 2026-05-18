@@ -3,12 +3,22 @@
 @theme {
   --color-wilom-navy: #0f172a;
   --color-wilom-red: #dc2626;
-  --color-wilom-gray: #64748b;
-  --color-wilom-light: #f8fafc;
+  --color-wilom-lightGray: #f8fafc;
 }
 
-@layer base {
-  body {
-    @apply bg-wilom-light text-slate-900 font-sans;
-  }
+/* ADD THIS SCROLLING ANIMATION */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 30s linear infinite;
+}
+
+/* Pause on hover for desktop users */
+.animate-marquee:hover {
+  animation-play-state: paused;
 }

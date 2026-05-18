@@ -111,7 +111,7 @@ export default function VehicleDetails() {
                <div className="space-y-4 pt-8 border-t border-slate-50">
                   <SpecRow label="Stock #" value={v.stock_number} color="text-[#dc2626]" />
                   <SpecRow label="Year" value={v.year} />
-                  <SpecRow label="Mileage" value={`${v.mileage_miles?.toLocaleString()} Mi`} />
+                  <SpecRow label="Mileage" value={`${v.mileage_miles?.toLocaleString()} Km`} />
                   <SpecRow label="Gearbox" value={v.gearbox} />
                   <SpecRow label="Axle" value={v.axle_config} />
                   <SpecRow label="Location" value={v.location} />

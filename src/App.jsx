@@ -14,6 +14,7 @@ import HowItWorks from './pages/public/HowItWorks';
 import VehicleDetails from './pages/public/VehicleDetails';
 import Privacy from './pages/public/Privacy';
 import Terms from './pages/public/Terms';
+import Export from './pages/public/Export'; // ← ADDED
 
 // Admin & Auth Pages
 import Dashboard from './pages/admin/Dashboard';
@@ -78,11 +79,12 @@ export default function App() {
           <Route path="/about" element={<About />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/vehicle/:id" element={<VehicleDetails />} />
-          
+          <Route path="/export" element={<Export />} /> {/* ← ADDED */}
+
           {/* LEGAL ROUTES */}
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
-          
+
           {/* AUTHENTICATION */}
           <Route path="/login" element={<Login />} />
 

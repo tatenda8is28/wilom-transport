@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Truck, Menu, X, MessageCircle, Phone } from 'lucide-react';
+import { Truck, Menu, X, MessageCircle, Phone, Lock } from 'lucide-react';
 import { supabase } from '../../api/supabase';
+
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
 
-  // Prevent background scrolling when mobile menu is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -16,12 +16,10 @@ export default function Navbar() {
     }
   }, [isOpen]);
 
-  // Close menu when route changes
   useEffect(() => {
     setIsOpen(false);
   }, [location]);
 
-  // Hide Navbar if we are in the admin dashboard
   if (location.pathname.startsWith('/admin')) return null;
 
   const trackContactLead = async () => {
@@ -43,6 +41,7 @@ export default function Navbar() {
           <Link to="/inventory" className="hover:text-[#dc2626] transition">Inventory</Link>
           <Link to="/about" className="hover:text-[#dc2626] transition">About</Link>
           <Link to="/how-it-works" className="hover:text-[#dc2626] transition">How It Works</Link>
+          <Link to="/export" className="hover:text-[#dc2626] transition">Export</Link>
         </div>
 
         {/* DESKTOP CONTACT BUTTON */}
@@ -62,10 +61,10 @@ export default function Navbar() {
         </button>
       </div>
 
-      {/* MOBILE SIDE-SLIDE MENU (OFF-CANVAS) */}
+      {/* MOBILE SIDE-SLIDE MENU */}
       <div className={`fixed inset-0 z-[110] transition-visibility duration-300 ${isOpen ? 'visible' : 'invisible'}`}>
         
-        {/* BLACK OVERLAY/BACKDROP */}
+        {/* BACKDROP */}
         <div 
           className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0'}`}
           onClick={() => setIsOpen(false)}
@@ -89,9 +88,10 @@ export default function Navbar() {
               <Link to="/inventory" className="block text-3xl font-black text-[#0f172a] uppercase italic tracking-tighter hover:text-[#dc2626]">Inventory</Link>
               <Link to="/about" className="block text-3xl font-black text-[#0f172a] uppercase italic tracking-tighter hover:text-[#dc2626]">About Us</Link>
               <Link to="/how-it-works" className="block text-3xl font-black text-[#0f172a] uppercase italic tracking-tighter hover:text-[#dc2626]">How It Works</Link>
+              <Link to="/export" className="block text-3xl font-black text-[#0f172a] uppercase italic tracking-tighter hover:text-[#dc2626]">Export</Link>
             </div>
 
-            <div className="pt-8 border-t border-slate-50 space-y-6">
+            <div className="pt-8 border-t border-slate-50 space-y-4">
               <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Quick Contact</p>
               <a href="tel:+263710500296" className="flex items-center gap-4 text-[#0f172a] font-bold text-lg">
                 <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-[#dc2626]"><Phone size={20}/></div>
@@ -103,6 +103,14 @@ export default function Navbar() {
               >
                 <MessageCircle size={24} /> WhatsApp Us
               </button>
+
+              {/* ADMIN LOGIN BUTTON */}
+              <Link
+                to="/login"
+                className="w-full border border-slate-200 text-slate-400 py-3 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:border-[#0f172a] hover:text-[#0f172a] transition-all"
+              >
+                <Lock size={13} /> Admin Login
+              </Link>
             </div>
           </div>
 

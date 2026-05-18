@@ -11,7 +11,7 @@ export default function About() {
           <img src="/hero-truck.jpg" className="w-full h-full object-cover" alt="" />
         </div>
         <div className="max-w-7xl mx-auto px-4 relative z-10 text-left uppercase italic">
-          <span className="text-[#dc2626] font-black tracking-[0.4em] text-[10px] block mb-4">Wilom Trans Solutions</span>
+          <span className="text-[#dc2626] font-black tracking-[0.4em] text-[10px] block mb-4">Wilom Transport Masvanhise Solutions  PTY(LTD)</span>
           <h1 className="text-5xl md:text-8xl font-black text-white tracking-tighter leading-none">Registered. <br /> Reliable. <span className="text-[#dc2626]">Affordable.</span></h1>
         </div>
       </section>
@@ -37,7 +37,7 @@ export default function About() {
           <div className="text-left order-2 md:order-1">
             <h2 className="text-3xl md:text-4xl font-black text-[#0f172a] mb-8 leading-tight italic uppercase tracking-tighter">Supplying <br /> Southern Africa.</h2>
             <div className="space-y-6 text-base md:text-lg text-slate-600 font-medium leading-relaxed">
-              <p><span className="text-[#0f172a] font-black italic">WILOM TRANS</span> is a registered company that aims to supply Southern Africa with reliable and affordable trucks.</p>
+              <p><span className="text-[#0f172a] font-black italic"></span> We are a registered company that aims to supply Southern Africa with reliable and affordable trucks.</p>
               <p>We specialize in <span className="text-[#dc2626] font-black uppercase">MAN tractor units</span> and trailers from the UK, documenting every journey on social media to build absolute trust with our community.</p>
             </div>
             <div className="mt-12">
@@ -51,40 +51,26 @@ export default function About() {
       </section>
 
       {/* GLOBAL LOGISTICS SECTION */}
-      <section className="max-w-7xl mx-auto px-4 py-32 grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-         <div className="text-left">
-            <span className="text-[#dc2626] font-black uppercase tracking-[0.4em] text-[10px] block mb-3">Global Logistics</span>
-            <h2 className="text-4xl md:text-6xl font-black text-[#0f172a] italic uppercase tracking-tighter mb-8 leading-none">Our client base <br /> is worldwide..!</h2>
-            <p className="text-slate-500 font-medium text-lg leading-relaxed mb-12">Shipping to right-hand drive nations across Africa, Asia, and The Caribbean with full documentation and port logistics support.</p>
-            
-            {/* VIBRANT FLAGS */}
-            <div className="flex flex-wrap gap-4 md:gap-6">
-              <img src="https://flagcdn.com/mw.svg" className="h-8 md:h-10 w-auto rounded shadow-sm" alt="Malawi" />
-              <img src="https://flagcdn.com/zm.svg" className="h-8 md:h-10 w-auto rounded shadow-sm" alt="Zambia" />
-              <img src="https://flagcdn.com/zw.svg" className="h-8 md:h-10 w-auto rounded shadow-sm" alt="Zimbabwe" />
-              <img src="https://flagcdn.com/tz.svg" className="h-8 md:h-10 w-auto rounded shadow-sm" alt="Tanzania" />
-            </div>
-         </div>
-
-         <div className="bg-[#0f172a] p-10 md:p-16 rounded-[3rem] text-white text-left relative overflow-hidden shadow-2xl">
-            <div className="absolute top-0 right-0 p-10 opacity-5 rotate-12"><Anchor size={200} /></div>
-            <h4 className="text-[#dc2626] font-black uppercase tracking-widest text-[10px] mb-8 relative z-10">Primary Destinations</h4>
-            <ul className="space-y-6 relative z-10">
-               <li className="flex items-center gap-4 group">
-                  <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-[#dc2626]"><Anchor size={18}/></div>
-                  <span className="font-black text-lg italic">Walvis Bay, Namibia</span>
-               </li>
-               <li className="flex items-center gap-4 group">
-                  <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-[#dc2626]"><Anchor size={18}/></div>
-                  <span className="font-black text-lg italic">Durban, South Africa</span>
-               </li>
-               <li className="flex items-center gap-4 group">
-                  <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-[#dc2626]"><Anchor size={18}/></div>
-                  <span className="font-black text-lg italic">Dar es Salaam, Tanzania</span>
-               </li>
-            </ul>
-         </div>
-      </section>
+     <section className="max-w-7xl mx-auto px-4 py-32 pb-40">
+          <div className="grid md:grid-cols-2 gap-16 items-center">
+             <div className="text-left">
+                <h2 className="text-4xl md:text-6xl font-black text-[#0f172a] italic uppercase tracking-tighter mb-8 leading-none">Our client base <br /> is worldwide..!</h2>
+                <p className="text-slate-500 font-medium text-lg leading-relaxed mb-8">Shipping to majority of right-hand drive countries around the World.</p>
+                <div className="flex gap-6"><img src="https://flagcdn.com/mw.svg" className="h-10 w-auto rounded shadow-sm" alt="Malawi" /><img src="https://flagcdn.com/zm.svg" className="h-10 w-auto rounded shadow-sm" alt="Zambia" /><img src="https://flagcdn.com/zw.svg" className="h-10 w-auto rounded shadow-sm" alt="Zimbabwe" /><img src="https://flagcdn.com/tz.svg" className="h-10 w-auto rounded shadow-sm" alt="Tanzania" /></div>
+             </div>
+             <div className="bg-[#0f172a] p-10 md:p-16 rounded-[4rem] text-white shadow-2xl relative overflow-hidden">
+                <div className="relative z-10 text-left">
+                   <h4 className="text-[#dc2626] font-black uppercase tracking-widest text-xs mb-8">African Port Destinations</h4>
+                   <ul className="space-y-6">
+                      <li className="flex items-center gap-4"><Anchor size={18} className="text-[#dc2626]"/> <div><p className="font-black text-lg">Walvis Bay</p><p className="text-slate-500 text-[10px] uppercase">Namibia</p></div></li>
+                      <li className="flex items-center gap-4"><Anchor size={18} className="text-[#dc2626]"/> <div><p className="font-black text-lg">Durban</p><p className="text-slate-500 text-[10px] uppercase">South Africa</p></div></li>
+                      <li className="flex items-center gap-4"><Anchor size={18} className="text-[#dc2626]"/> <div><p className="font-black text-lg">Maputo</p><p className="text-slate-500 text-[10px] uppercase">Mozambique</p></div></li>
+                      <li className="flex items-center gap-4"><Anchor size={18} className="text-[#dc2626]"/> <div><p className="font-black text-lg">Dar es Salaam</p><p className="text-slate-500 text-[10px] uppercase">Tanzania</p></div></li>
+                   </ul>
+                </div>
+             </div>
+          </div>
+        </section>
     </div>
   );
 }
